@@ -295,19 +295,19 @@ sail-build:
 	./vendor/bin/sail build --no-cache
 
 docker-build:
-	docker build -t alcaldia-api:latest .
+	docker build -t senefco-api:latest .
 
 docker-run:
-	docker run -d --name alcaldia_api --env-file ../.env.docker -p 8000:8000 alcaldia-api:latest
+	docker run -d --name senefco_api --env-file ../.env.docker -p 8000:8000 senefco-api:latest
 
 docker-stop:
-	docker stop alcaldia_api && docker rm alcaldia_api
+	docker stop senefco_api && docker rm senefco_api
 
 docker-logs:
-	docker logs -f alcaldia_api
+	docker logs -f senefco_api
 
 docker-bash:
-	docker exec -it alcaldia_api bash
+	docker exec -it senefco_api bash
 
 swagger:
 	php artisan l5-swagger:generate
