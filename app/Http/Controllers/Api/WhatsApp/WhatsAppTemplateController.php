@@ -16,17 +16,6 @@ class WhatsAppTemplateController extends Controller
         $this->initializeWhatsAppService();
     }
 
-    /**
-     * POST /api/whatsapp/send/template
-     * {
-     *   "to": "591...",
-     *   "template": "hello_world",
-     *   "language": "en_US",
-     *   "parameters": [
-     *     { "type": "text", "text": "valor1" }
-     *   ]
-     * }
-     */
     public function template(Request $request): JsonResponse
     {
         $data = $request->validate([

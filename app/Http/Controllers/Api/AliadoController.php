@@ -12,8 +12,8 @@ class AliadoController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = $request->get('query', '');
-        $size  = (int) $request->get('pageSize', 50);
-        $page  = (int) $request->get('pageIndex', 1);
+        $size = (int) $request->get('pageSize', 50);
+        $page = (int) $request->get('pageIndex', 1);
 
         $q = DB::table('web_aliado');
         if ($query) {
@@ -27,7 +27,7 @@ class AliadoController extends Controller
         }
 
         $total = $q->count();
-        $data  = $q->orderBy('orden')->orderBy('nombre')->offset(($page - 1) * $size)->limit($size)->get();
+        $data = $q->orderBy('orden')->orderBy('nombre')->offset(($page - 1) * $size)->limit($size)->get();
 
         return response()->json(['data' => $data, 'total' => $total]);
     }
@@ -45,20 +45,20 @@ class AliadoController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'nombre'      => ['required', 'string', 'max:200'],
-            'logo_url'    => ['required', 'string', 'max:255'],
-            'logo_alt'    => ['nullable', 'string', 'max:255'],
-            'url_sitio'   => ['nullable', 'string', 'max:255'],
+            'nombre' => ['required', 'string', 'max:200'],
+            'logo_url' => ['required', 'string', 'max:255'],
+            'logo_alt' => ['nullable', 'string', 'max:255'],
+            'url_sitio' => ['nullable', 'string', 'max:255'],
             'descripcion' => ['nullable', 'string', 'max:500'],
-            'tipo'        => ['nullable', 'string', 'max:100'],
-            'orden'       => ['nullable', 'integer'],
-            'activo'      => ['nullable', 'boolean'],
+            'tipo' => ['nullable', 'string', 'max:100'],
+            'orden' => ['nullable', 'integer'],
+            'activo' => ['nullable', 'boolean'],
         ]);
-        $data['orden']      = $request->integer('orden', 0);
-        $data['activo']     = $request->boolean('activo', true);
+        $data['orden'] = $request->integer('orden', 0);
+        $data['activo'] = $request->boolean('activo', true);
         $data['created_at'] = now();
 
-        $id  = DB::table('web_aliado')->insertGetId($data);
+        $id = DB::table('web_aliado')->insertGetId($data);
         $row = DB::table('web_aliado')->find($id);
 
         return response()->json($row, 201);
@@ -72,14 +72,14 @@ class AliadoController extends Controller
         }
 
         $data = $request->validate([
-            'nombre'      => ['sometimes', 'required', 'string', 'max:200'],
-            'logo_url'    => ['sometimes', 'required', 'string', 'max:255'],
-            'logo_alt'    => ['nullable', 'string', 'max:255'],
-            'url_sitio'   => ['nullable', 'string', 'max:255'],
+            'nombre' => ['sometimes', 'required', 'string', 'max:200'],
+            'logo_url' => ['sometimes', 'required', 'string', 'max:255'],
+            'logo_alt' => ['nullable', 'string', 'max:255'],
+            'url_sitio' => ['nullable', 'string', 'max:255'],
             'descripcion' => ['nullable', 'string', 'max:500'],
-            'tipo'        => ['nullable', 'string', 'max:100'],
-            'orden'       => ['nullable', 'integer'],
-            'activo'      => ['nullable', 'boolean'],
+            'tipo' => ['nullable', 'string', 'max:100'],
+            'orden' => ['nullable', 'integer'],
+            'activo' => ['nullable', 'boolean'],
         ]);
         $data['updated_at'] = now();
         DB::table('web_aliado')->where('id', $id)->update($data);

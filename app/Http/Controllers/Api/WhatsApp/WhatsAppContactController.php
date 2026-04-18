@@ -16,15 +16,6 @@ class WhatsAppContactController extends Controller
         $this->initializeWhatsAppService();
     }
 
-    /**
-     * POST /api/whatsapp/send/contacts
-     * {
-     *   "to": "591...",
-     *   "contacts": [
-     *     { "first_name": "Juan", "last_name": "Pérez", "phone": "+591612345678" }
-     *   ]
-     * }
-     */
     public function contacts(Request $request): JsonResponse
     {
         $data = $request->validate([

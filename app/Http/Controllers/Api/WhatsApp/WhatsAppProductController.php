@@ -16,10 +16,6 @@ class WhatsAppProductController extends Controller
         $this->initializeWhatsAppService();
     }
 
-    /**
-     * POST /api/whatsapp/send/product
-     * { "to":"591...", "catalog_id":"CAT123", "product_id":"SKU001", "body":"...", "footer":"..." }
-     */
     public function singleProduct(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -33,16 +29,6 @@ class WhatsAppProductController extends Controller
         return response()->json($this->wa->sendSingleProduct($data['to'], $data['catalog_id'], $data['product_id'], $data['body'] ?? '', $data['footer'] ?? ''));
     }
 
-    /**
-     * POST /api/whatsapp/send/products
-     * {
-     *   "to":"591...", "catalog_id":"CAT123",
-     *   "header":"Tienda", "body":"Elige", "footer":"PuntoVentas",
-     *   "sections":[
-     *     { "title":"Ropa", "products":[{"product_retailer_id":"SKU001"}] }
-     *   ]
-     * }
-     */
     public function multiProduct(Request $request): JsonResponse
     {
         $data = $request->validate([

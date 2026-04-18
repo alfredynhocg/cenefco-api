@@ -12,14 +12,14 @@ class NotaPrensaController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = $request->get('query', '');
-        $size  = (int) $request->get('pageSize', 20);
-        $page  = (int) $request->get('pageIndex', 1);
+        $size = (int) $request->get('pageSize', 20);
+        $page = (int) $request->get('pageIndex', 1);
 
         $q = DB::table('web_nota_prensa');
         if ($query) {
             $q->where(function ($sq) use ($query) {
                 $sq->where('titulo', 'like', "%{$query}%")
-                   ->orWhere('medio', 'like', "%{$query}%");
+                    ->orWhere('medio', 'like', "%{$query}%");
             });
         }
         if ($request->boolean('soloDestacadas', false)) {
@@ -30,7 +30,7 @@ class NotaPrensaController extends Controller
         }
 
         $total = $q->count();
-        $data  = $q->orderByDesc('fecha_publicacion')->orderBy('orden')->offset(($page - 1) * $size)->limit($size)->get();
+        $data = $q->orderByDesc('fecha_publicacion')->orderBy('orden')->offset(($page - 1) * $size)->limit($size)->get();
 
         return response()->json(['data' => $data, 'total' => $total]);
     }
@@ -48,23 +48,23 @@ class NotaPrensaController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'titulo'             => ['required', 'string', 'max:300'],
-            'medio'              => ['required', 'string', 'max:200'],
-            'logo_medio_url'     => ['nullable', 'string', 'max:255'],
-            'logo_medio_alt'     => ['nullable', 'string', 'max:255'],
-            'resumen'            => ['nullable', 'string'],
-            'url_noticia'        => ['nullable', 'string', 'max:500'],
-            'fecha_publicacion'  => ['required', 'date'],
-            'destacada'          => ['nullable', 'boolean'],
-            'orden'              => ['nullable', 'integer'],
-            'activo'             => ['nullable', 'boolean'],
+            'titulo' => ['required', 'string', 'max:300'],
+            'medio' => ['required', 'string', 'max:200'],
+            'logo_medio_url' => ['nullable', 'string', 'max:255'],
+            'logo_medio_alt' => ['nullable', 'string', 'max:255'],
+            'resumen' => ['nullable', 'string'],
+            'url_noticia' => ['nullable', 'string', 'max:500'],
+            'fecha_publicacion' => ['required', 'date'],
+            'destacada' => ['nullable', 'boolean'],
+            'orden' => ['nullable', 'integer'],
+            'activo' => ['nullable', 'boolean'],
         ]);
-        $data['destacada']   = $request->boolean('destacada', false);
-        $data['orden']       = $request->integer('orden', 0);
-        $data['activo']      = $request->boolean('activo', true);
-        $data['created_at']  = now();
+        $data['destacada'] = $request->boolean('destacada', false);
+        $data['orden'] = $request->integer('orden', 0);
+        $data['activo'] = $request->boolean('activo', true);
+        $data['created_at'] = now();
 
-        $id  = DB::table('web_nota_prensa')->insertGetId($data);
+        $id = DB::table('web_nota_prensa')->insertGetId($data);
         $row = DB::table('web_nota_prensa')->find($id);
 
         return response()->json($row, 201);
@@ -78,16 +78,16 @@ class NotaPrensaController extends Controller
         }
 
         $data = $request->validate([
-            'titulo'            => ['sometimes', 'required', 'string', 'max:300'],
-            'medio'             => ['sometimes', 'required', 'string', 'max:200'],
-            'logo_medio_url'    => ['nullable', 'string', 'max:255'],
-            'logo_medio_alt'    => ['nullable', 'string', 'max:255'],
-            'resumen'           => ['nullable', 'string'],
-            'url_noticia'       => ['nullable', 'string', 'max:500'],
+            'titulo' => ['sometimes', 'required', 'string', 'max:300'],
+            'medio' => ['sometimes', 'required', 'string', 'max:200'],
+            'logo_medio_url' => ['nullable', 'string', 'max:255'],
+            'logo_medio_alt' => ['nullable', 'string', 'max:255'],
+            'resumen' => ['nullable', 'string'],
+            'url_noticia' => ['nullable', 'string', 'max:500'],
             'fecha_publicacion' => ['sometimes', 'required', 'date'],
-            'destacada'         => ['nullable', 'boolean'],
-            'orden'             => ['nullable', 'integer'],
-            'activo'            => ['nullable', 'boolean'],
+            'destacada' => ['nullable', 'boolean'],
+            'orden' => ['nullable', 'integer'],
+            'activo' => ['nullable', 'boolean'],
         ]);
         $data['updated_at'] = now();
         DB::table('web_nota_prensa')->where('id', $id)->update($data);

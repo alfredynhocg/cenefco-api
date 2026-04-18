@@ -12,14 +12,14 @@ class CertificadoController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = $request->get('query', '');
-        $size  = (int) $request->get('pageSize', 20);
-        $page  = (int) $request->get('pageIndex', 1);
+        $size = (int) $request->get('pageSize', 20);
+        $page = (int) $request->get('pageIndex', 1);
 
         $q = DB::table('t_certificado');
         if ($query) {
             $q->where(function ($sq) use ($query) {
                 $sq->where('nombre_en_certificado', 'like', "%{$query}%")
-                   ->orWhere('codigo_verificacion', 'like', "%{$query}%");
+                    ->orWhere('codigo_verificacion', 'like', "%{$query}%");
             });
         }
         if ($request->has('usuario_id')) {
@@ -33,7 +33,7 @@ class CertificadoController extends Controller
         }
 
         $total = $q->count();
-        $data  = $q->orderByDesc('id')->offset(($page - 1) * $size)->limit($size)->get();
+        $data = $q->orderByDesc('id')->offset(($page - 1) * $size)->limit($size)->get();
 
         return response()->json(['data' => $data, 'total' => $total]);
     }
@@ -61,27 +61,27 @@ class CertificadoController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'lista_aprobado_id'       => ['required', 'integer'],
-            'plantilla_id'            => ['required', 'integer'],
-            'usuario_id'              => ['required', 'integer'],
-            'imparte_id'              => ['required', 'integer'],
-            'nombre_en_certificado'   => ['required', 'string', 'max:300'],
+            'lista_aprobado_id' => ['required', 'integer'],
+            'plantilla_id' => ['required', 'integer'],
+            'usuario_id' => ['required', 'integer'],
+            'imparte_id' => ['required', 'integer'],
+            'nombre_en_certificado' => ['required', 'string', 'max:300'],
             'programa_en_certificado' => ['required', 'string', 'max:300'],
-            'condicion'               => ['required', 'string', 'max:50'],
-            'nota_final'              => ['nullable', 'numeric'],
-            'horas_academicas'        => ['nullable', 'integer'],
-            'fecha_inicio_curso'      => ['nullable', 'date'],
-            'fecha_fin_curso'         => ['nullable', 'date'],
-            'codigo_verificacion'     => ['required', 'string', 'max:50', 'unique:t_certificado,codigo_verificacion'],
-            'qr_url'                  => ['nullable', 'string', 'max:500'],
-            'archivo_url'             => ['nullable', 'string', 'max:500'],
-            'archivo_miniatura_url'   => ['nullable', 'string', 'max:255'],
-            'estado'                  => ['nullable', 'string', 'max:50'],
+            'condicion' => ['required', 'string', 'max:50'],
+            'nota_final' => ['nullable', 'numeric'],
+            'horas_academicas' => ['nullable', 'integer'],
+            'fecha_inicio_curso' => ['nullable', 'date'],
+            'fecha_fin_curso' => ['nullable', 'date'],
+            'codigo_verificacion' => ['required', 'string', 'max:50', 'unique:t_certificado,codigo_verificacion'],
+            'qr_url' => ['nullable', 'string', 'max:500'],
+            'archivo_url' => ['nullable', 'string', 'max:500'],
+            'archivo_miniatura_url' => ['nullable', 'string', 'max:255'],
+            'estado' => ['nullable', 'string', 'max:50'],
         ]);
-        $data['estado']       = $data['estado'] ?? 'generado';
-        $data['created_at']   = now();
+        $data['estado'] = $data['estado'] ?? 'generado';
+        $data['created_at'] = now();
 
-        $id  = DB::table('t_certificado')->insertGetId($data);
+        $id = DB::table('t_certificado')->insertGetId($data);
         $row = DB::table('t_certificado')->find($id);
 
         return response()->json($row, 201);
@@ -95,14 +95,14 @@ class CertificadoController extends Controller
         }
 
         $data = $request->validate([
-            'nombre_en_certificado'   => ['sometimes', 'required', 'string', 'max:300'],
+            'nombre_en_certificado' => ['sometimes', 'required', 'string', 'max:300'],
             'programa_en_certificado' => ['sometimes', 'required', 'string', 'max:300'],
-            'qr_url'                  => ['nullable', 'string', 'max:500'],
-            'archivo_url'             => ['nullable', 'string', 'max:500'],
-            'archivo_miniatura_url'   => ['nullable', 'string', 'max:255'],
-            'estado'                  => ['nullable', 'string', 'max:50'],
-            'motivo_anulacion'        => ['nullable', 'string'],
-            'anulado_por'             => ['nullable', 'integer'],
+            'qr_url' => ['nullable', 'string', 'max:500'],
+            'archivo_url' => ['nullable', 'string', 'max:500'],
+            'archivo_miniatura_url' => ['nullable', 'string', 'max:255'],
+            'estado' => ['nullable', 'string', 'max:50'],
+            'motivo_anulacion' => ['nullable', 'string'],
+            'anulado_por' => ['nullable', 'integer'],
         ]);
         $data['updated_at'] = now();
         DB::table('t_certificado')->where('id', $id)->update($data);

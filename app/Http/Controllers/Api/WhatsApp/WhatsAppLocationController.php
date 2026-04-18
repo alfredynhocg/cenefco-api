@@ -16,10 +16,6 @@ class WhatsAppLocationController extends Controller
         $this->initializeWhatsAppService();
     }
 
-    /**
-     * POST /api/whatsapp/send/location
-     * { "to": "591...", "lat": -17.38, "lng": -66.15, "name": "Tienda", "address": "Av. X" }
-     */
     public function location(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -33,10 +29,6 @@ class WhatsAppLocationController extends Controller
         return response()->json($this->wa->sendLocation($data['to'], $data['lat'], $data['lng'], $data['name'] ?? '', $data['address'] ?? ''));
     }
 
-    /**
-     * POST /api/whatsapp/send/location-request
-     * { "to": "591...", "body": "¿Dónde te encuentras?" }
-     */
     public function locationRequest(Request $request): JsonResponse
     {
         $data = $request->validate(['to' => 'required|string', 'body' => 'string']);

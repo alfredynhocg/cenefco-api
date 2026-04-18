@@ -9,6 +9,31 @@ use Illuminate\Support\Facades\DB;
 
 class PreinscripcionController extends Controller
 {
+    public function store(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'programa_id' => ['nullable', 'integer'],
+            'nombre' => ['required', 'string', 'max:200'],
+            'apellido_paterno' => ['nullable', 'string', 'max:100'],
+            'apellido_materno' => ['nullable', 'string', 'max:100'],
+            'ci' => ['nullable', 'string', 'max:30'],
+            'email' => ['required', 'email', 'max:100'],
+            'telefono' => ['nullable', 'string', 'max:20'],
+            'ciudad' => ['nullable', 'string', 'max:120'],
+            'mensaje' => ['nullable', 'string'],
+            'origen' => ['nullable', 'string', 'max:100'],
+        ]);
+
+        $data['estado'] = 'pendiente';
+        $data['ip_origen'] = $request->ip();
+        $data['created_at'] = now()->toDateTimeString();
+        $data['updated_at'] = now()->toDateTimeString();
+
+        $id = DB::table('web_preinscripcion')->insertGetId($data);
+
+        return response()->json(DB::table('web_preinscripcion')->where('id', $id)->first(), 201);
+    }
+
     public function index(Request $request): JsonResponse
     {
         $q = DB::table('web_preinscripcion as p')

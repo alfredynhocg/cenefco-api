@@ -41,6 +41,11 @@ class WhatsAppAdminController extends Controller
 
         $paginated = $q->paginate($pageSize, ['*'], 'page', $pageIndex);
 
+        $asesorIds = collect($paginated->items())->pluck('asesor_id')->filter()->unique()->values();
+        $asesores = $asesorIds->isNotEmpty()
+            ? \Illuminate\Support\Facades\DB::table('web_asesor')->whereIn('id', $asesorIds)->get()->keyBy('id')
+            : collect();
+
         $data = collect($paginated->items())->map(fn ($c) => [
             'id' => $c->id,
             'phone' => $c->phone,
@@ -48,6 +53,8 @@ class WhatsAppAdminController extends Controller
             'estado' => $c->estado,
             'contexto' => $c->contexto,
             'cliente_id' => $c->cliente_id,
+            'asesor_id' => $c->asesor_id,
+            'asesor' => $c->asesor_id ? $asesores->get($c->asesor_id) : null,
             'etiquetas' => $c->etiquetas->map(fn ($e) => [
                 'id' => $e->id,
                 'nombre' => $e->nombre,
@@ -79,11 +86,17 @@ class WhatsAppAdminController extends Controller
             'created_at' => $m->created_at?->toIso8601String(),
         ])->all();
 
+        $asesor = $conv->asesor_id
+            ? \Illuminate\Support\Facades\DB::table('web_asesor')->where('id', $conv->asesor_id)->first()
+            : null;
+
         return response()->json([
             'data' => $data,
             'phone' => $conv->phone,
             'nombre' => $conv->nombre,
             'estado' => $conv->estado,
+            'asesor_id' => $conv->asesor_id,
+            'asesor' => $asesor,
         ]);
     }
 
@@ -201,8 +214,6 @@ class WhatsAppAdminController extends Controller
         ]);
     }
 
-    // ── Etiquetas ─────────────────────────────────────────────────────────────
-
     public function etiquetas(): JsonResponse
     {
         $etiquetas = WhatsappEtiqueta::orderBy('nombre')->get(['id', 'nombre', 'color']);
@@ -264,8 +275,6 @@ class WhatsAppAdminController extends Controller
 
         return response()->json(['etiquetas' => $etiquetas]);
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
 
     public function enviarPlantilla(Request $request): JsonResponse
     {

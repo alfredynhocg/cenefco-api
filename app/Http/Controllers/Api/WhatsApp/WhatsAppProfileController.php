@@ -16,18 +16,11 @@ class WhatsAppProfileController extends Controller
         $this->initializeWhatsAppService();
     }
 
-    /**
-     * GET /api/whatsapp/profile
-     */
     public function getProfile(): JsonResponse
     {
         return response()->json($this->wa->getBusinessProfile());
     }
 
-    /**
-     * PUT /api/whatsapp/profile
-     * { "about": "...", "address": "...", "description": "...", "email": "..." }
-     */
     public function updateProfile(Request $request): JsonResponse
     {
         $data = $request->validate([

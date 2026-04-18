@@ -2,11 +2,12 @@
 
 namespace App\Infrastructure\Shared\Services;
 
+use App\Infrastructure\WhatsApp\BotHandlers\DocenteHandler;
 use App\Infrastructure\WhatsApp\BotHandlers\InfoHandler;
+use App\Infrastructure\WhatsApp\BotHandlers\InscripcionBotHandler;
 use App\Infrastructure\WhatsApp\BotHandlers\MenuHandler;
-use App\Infrastructure\WhatsApp\BotHandlers\SecretariaHandler;
+use App\Infrastructure\WhatsApp\BotHandlers\ProgramaHandler;
 use App\Infrastructure\WhatsApp\BotHandlers\SeguimientoHandler;
-use App\Infrastructure\WhatsApp\BotHandlers\TramiteHandler;
 use App\Infrastructure\WhatsApp\ConversationManager;
 use App\Infrastructure\WhatsApp\Enums\BotButton;
 use App\Infrastructure\WhatsApp\Enums\BotState;
@@ -17,10 +18,11 @@ class WhatsAppBotService
         private readonly WhatsAppService $wa,
         private readonly ConversationManager $conv,
         private readonly MenuHandler $menu,
-        private readonly TramiteHandler $tramite,
+        private readonly ProgramaHandler $programa,
         private readonly InfoHandler $info,
-        private readonly SecretariaHandler $secretaria,
+        private readonly DocenteHandler $docente,
         private readonly SeguimientoHandler $seguimiento,
+        private readonly InscripcionBotHandler $inscripcion,
         private readonly AgentService $agent,
     ) {}
 
@@ -28,7 +30,6 @@ class WhatsAppBotService
     {
         $conversacion = $this->conv->getOrCreate($from, $nombre);
         $estado = $conversacion->estado;
-        $contexto = $conversacion->contexto ?? [];
 
         $contenido = $message['text']['body']
             ?? $message['interactive']['button_reply']['title'] ?? null
@@ -37,7 +38,7 @@ class WhatsAppBotService
 
         if ($type === 'text') {
             $text = trim($message['text']['body'] ?? '');
-            $this->routeByText($from, $text, $estado, $contexto);
+            $this->routeByText($from, $text, $estado);
 
             return;
         }
@@ -46,20 +47,47 @@ class WhatsAppBotService
             $id = $message['interactive']['button_reply']['id']
                 ?? $message['interactive']['list_reply']['id']
                 ?? '';
-            $this->routeByButton($from, $id, $contexto);
+            $this->routeByButton($from, $id);
         }
     }
 
-    private function routeByText(string $from, string $text, string $estado, array $contexto): void
+    private function routeByText(string $from, string $text, string $estado): void
     {
         if ($estado === BotState::SOPORTE->value) {
-            $this->wa->sendText($from, '📩 Tu mensaje fue recibido. Un funcionario te atenderá pronto.');
+            $this->wa->sendText($from, '📩 Tu mensaje fue recibido. Un asesor te atenderá pronto.');
 
             return;
         }
 
-        if ($estado === BotState::SEGUIMIENTO_TRAMITE->value) {
-            $this->seguimiento->buscarPorNumero($from, $text);
+        if ($estado === BotState::CONSULTA_CI->value) {
+            $this->seguimiento->buscarPorCI($from, $text);
+
+            return;
+        }
+
+        $inscripcionStates = [
+            BotState::INSCRIPCION_NOMBRE->value,
+            BotState::INSCRIPCION_CI->value,
+            BotState::INSCRIPCION_EMAIL->value,
+            BotState::INSCRIPCION_CONFIRMAR->value,
+        ];
+
+        if (in_array($estado, $inscripcionStates, true)) {
+            $contexto = (array) ($this->conv->getOrCreate($from)->contexto ?? []);
+
+            if ($this->inscripcion->esCancelacion($text)) {
+                $this->inscripcion->cancelar($from);
+
+                return;
+            }
+
+            match ($estado) {
+                BotState::INSCRIPCION_NOMBRE->value => $this->inscripcion->recibirNombre($from, $text, $contexto),
+                BotState::INSCRIPCION_CI->value => $this->inscripcion->recibirCI($from, $text, $contexto),
+                BotState::INSCRIPCION_EMAIL->value => $this->inscripcion->recibirEmail($from, $text, $contexto),
+                BotState::INSCRIPCION_CONFIRMAR->value => $this->inscripcion->confirmar($from, $contexto),
+                default => null,
+            };
 
             return;
         }
@@ -77,7 +105,7 @@ class WhatsAppBotService
             }
         }
 
-        $this->wa->sendText($from, '⏳ Un momento, estoy buscando la respuesta...');
+        $this->wa->sendText($from, '⏳ Un momento, buscando la respuesta...');
 
         $respuesta = $this->agent->responder($from, $text);
 
@@ -94,12 +122,12 @@ class WhatsAppBotService
     {
         match ($intent) {
             'saludo' => $this->sendBienvenida($from),
-            'tramites' => $this->tramite->showLista($from),
-            'noticias' => $this->info->showNoticias($from),
+            'programas' => $this->programa->showLista($from),
             'eventos' => $this->info->showEventos($from),
-            'secretarias' => $this->secretaria->showLista($from),
-            'audiencias' => $this->info->showAudienciasPublicas($from),
-            'seguimiento' => $this->seguimiento->pedirNumero($from),
+            'docentes' => $this->docente->showLista($from),
+            'faqs' => $this->info->showFaqs($from),
+            'inscripcion' => $this->menu->handleInscripcion($from),
+            'consulta' => $this->seguimiento->pedirCI($from),
             'horario' => $this->menu->handleHorario($from),
             'ubicacion' => $this->menu->handleUbicacion($from),
             'soporte' => $this->menu->handleSoporte($from),
@@ -107,29 +135,26 @@ class WhatsAppBotService
         };
     }
 
-    private function routeByButton(string $from, string $id, array $contexto): void
+    private function routeByButton(string $from, string $id): void
     {
         match (true) {
             $id === BotButton::MENU->value => $this->menu->handle($from),
-            $id === BotButton::TRAMITES->value => $this->tramite->showLista($from),
-            $id === BotButton::NOTICIAS->value => $this->info->showNoticias($from),
-            $id === BotButton::COMUNICADOS->value => $this->info->showComunicados($from),
+            $id === BotButton::PROGRAMAS->value => $this->programa->showLista($from),
             $id === BotButton::EVENTOS->value => $this->info->showEventos($from),
-            $id === BotButton::SECRETARIAS->value => $this->secretaria->showLista($from),
-            $id === BotButton::AUTORIDADES->value => $this->info->showAutoridades($from),
-            $id === BotButton::AUDIENCIAS_PUBLICAS->value => $this->info->showAudienciasPublicas($from),
+            $id === BotButton::DOCENTES->value => $this->docente->showLista($from),
+            $id === BotButton::FAQS->value => $this->info->showFaqs($from),
+            $id === BotButton::INSCRIPCION->value => $this->menu->handleInscripcion($from),
             $id === BotButton::HORARIO->value => $this->menu->handleHorario($from),
             $id === BotButton::UBICACION->value => $this->menu->handleUbicacion($from),
             $id === BotButton::SOPORTE->value => $this->menu->handleSoporte($from),
-            $id === BotButton::SEGUIMIENTO->value => $this->seguimiento->pedirNumero($from),
 
-            str_starts_with($id, BotButton::PREFIX_TRAMITE) => $this->tramite->showDetalle($from, (int) substr($id, strlen(BotButton::PREFIX_TRAMITE))),
-            str_starts_with($id, BotButton::PREFIX_NOTICIA) => $this->info->showDetalleNoticia($from, (int) substr($id, strlen(BotButton::PREFIX_NOTICIA))),
-            str_starts_with($id, BotButton::PREFIX_COMUNICADO) => $this->info->showDetalleComunicado($from, (int) substr($id, strlen(BotButton::PREFIX_COMUNICADO))),
+            str_starts_with($id, BotButton::PREFIX_PROGRAMA) => $this->programa->showDetalle($from, (int) substr($id, strlen(BotButton::PREFIX_PROGRAMA))),
             str_starts_with($id, BotButton::PREFIX_EVENTO) => $this->info->showDetalleEvento($from, (int) substr($id, strlen(BotButton::PREFIX_EVENTO))),
-            str_starts_with($id, BotButton::PREFIX_SECRETARIA) => $this->secretaria->showDetalle($from, (int) substr($id, strlen(BotButton::PREFIX_SECRETARIA))),
-            str_starts_with($id, BotButton::PREFIX_AUTORIDAD) => $this->info->showDetalleAutoridad($from, (int) substr($id, strlen(BotButton::PREFIX_AUTORIDAD))),
-            str_starts_with($id, BotButton::PREFIX_AUDIENCIA) => $this->info->showDetalleAudiencia($from, (int) substr($id, strlen(BotButton::PREFIX_AUDIENCIA))),
+            str_starts_with($id, BotButton::PREFIX_DOCENTE) => $this->docente->showDetalle($from, (int) substr($id, strlen(BotButton::PREFIX_DOCENTE))),
+            str_starts_with($id, BotButton::PREFIX_INSCRIBIR) => $this->inscripcion->iniciar($from, (int) substr($id, strlen(BotButton::PREFIX_INSCRIBIR))),
+
+            $id === BotButton::INSCRIPCION_CONFIRMAR->value => $this->inscripcion->confirmar($from, (array) ($this->conv->getOrCreate($from)->contexto ?? [])),
+            $id === BotButton::INSCRIPCION_CANCELAR->value => $this->inscripcion->cancelar($from),
 
             default => $this->menu->handle($from),
         };
@@ -141,7 +166,7 @@ class WhatsAppBotService
         $conv = $this->conv->getOrCreate($from);
         $saludo = $conv->nombre ? "¡Hola, *{$conv->nombre}*!" : '¡Hola!';
 
-        $this->wa->sendText($from, "👋 {$saludo} Bienvenido/a al chatbot de *{$cenefco}*.\n\nEstoy aquí para ayudarte con información sobre trámites, noticias, eventos y más.");
+        $this->wa->sendText($from, "👋 {$saludo} Bienvenido/a al chatbot de *{$cenefco}*.\n\nEstoy aquí para ayudarte con información sobre nuestros programas, docentes, eventos e inscripciones.");
         $this->menu->handle($from);
     }
 

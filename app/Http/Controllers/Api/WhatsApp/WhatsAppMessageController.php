@@ -16,10 +16,6 @@ class WhatsAppMessageController extends Controller
         $this->initializeWhatsAppService();
     }
 
-    /**
-     * POST /api/whatsapp/send/text
-     * { "to": "591...", "message": "Hola!", "preview_url": false }
-     */
     public function text(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -31,10 +27,6 @@ class WhatsAppMessageController extends Controller
         return response()->json($this->wa->sendText($data['to'], $data['message'], $data['preview_url'] ?? false));
     }
 
-    /**
-     * POST /api/whatsapp/message/read
-     * { "message_id": "wamid.xxx" }
-     */
     public function markAsRead(Request $request): JsonResponse
     {
         $data = $request->validate(['message_id' => 'required|string']);
@@ -42,10 +34,6 @@ class WhatsAppMessageController extends Controller
         return response()->json($this->wa->markAsRead($data['message_id']));
     }
 
-    /**
-     * POST /api/whatsapp/message/react
-     * { "to": "591...", "message_id": "wamid.xxx", "emoji": "👍" }
-     */
     public function react(Request $request): JsonResponse
     {
         $data = $request->validate([

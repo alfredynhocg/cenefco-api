@@ -12,8 +12,8 @@ class GaleriaVideoController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = $request->get('query', '');
-        $size  = (int) $request->get('pageSize', 20);
-        $page  = (int) $request->get('pageIndex', 1);
+        $size = (int) $request->get('pageSize', 20);
+        $page = (int) $request->get('pageIndex', 1);
 
         $q = DB::table('web_galeria_video');
         if ($query) {
@@ -33,7 +33,7 @@ class GaleriaVideoController extends Controller
         }
 
         $total = $q->count();
-        $data  = $q->orderBy('orden')->orderByDesc('id')->offset(($page - 1) * $size)->limit($size)->get();
+        $data = $q->orderBy('orden')->orderByDesc('id')->offset(($page - 1) * $size)->limit($size)->get();
 
         return response()->json(['data' => $data, 'total' => $total]);
     }
@@ -51,27 +51,27 @@ class GaleriaVideoController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'titulo'        => ['required', 'string', 'max:300'],
-            'descripcion'   => ['nullable', 'string'],
-            'plataforma'    => ['nullable', 'string', 'max:50'],
-            'url_video'     => ['required', 'string', 'max:500'],
-            'video_id'      => ['nullable', 'string', 'max:100'],
+            'titulo' => ['required', 'string', 'max:300'],
+            'descripcion' => ['nullable', 'string'],
+            'plataforma' => ['nullable', 'string', 'max:50'],
+            'url_video' => ['required', 'string', 'max:500'],
+            'video_id' => ['nullable', 'string', 'max:100'],
             'miniatura_url' => ['nullable', 'string', 'max:255'],
-            'duracion'      => ['nullable', 'string', 'max:20'],
-            'tipo'          => ['nullable', 'string', 'max:100'],
-            'programa_id'   => ['nullable', 'integer'],
-            'destacado'     => ['nullable', 'boolean'],
-            'orden'         => ['nullable', 'integer'],
-            'activo'        => ['nullable', 'boolean'],
+            'duracion' => ['nullable', 'string', 'max:20'],
+            'tipo' => ['nullable', 'string', 'max:100'],
+            'programa_id' => ['nullable', 'integer'],
+            'destacado' => ['nullable', 'boolean'],
+            'orden' => ['nullable', 'integer'],
+            'activo' => ['nullable', 'boolean'],
         ]);
-        $data['plataforma']  = $data['plataforma'] ?? 'youtube';
-        $data['destacado']   = $request->boolean('destacado', false);
-        $data['orden']       = $request->integer('orden', 0);
-        $data['vistas']      = 0;
-        $data['activo']      = $request->boolean('activo', true);
-        $data['created_at']  = now();
+        $data['plataforma'] = $data['plataforma'] ?? 'youtube';
+        $data['destacado'] = $request->boolean('destacado', false);
+        $data['orden'] = $request->integer('orden', 0);
+        $data['vistas'] = 0;
+        $data['activo'] = $request->boolean('activo', true);
+        $data['created_at'] = now();
 
-        $id  = DB::table('web_galeria_video')->insertGetId($data);
+        $id = DB::table('web_galeria_video')->insertGetId($data);
         $row = DB::table('web_galeria_video')->find($id);
 
         return response()->json($row, 201);
@@ -85,18 +85,18 @@ class GaleriaVideoController extends Controller
         }
 
         $data = $request->validate([
-            'titulo'        => ['sometimes', 'required', 'string', 'max:300'],
-            'descripcion'   => ['nullable', 'string'],
-            'plataforma'    => ['nullable', 'string', 'max:50'],
-            'url_video'     => ['sometimes', 'required', 'string', 'max:500'],
-            'video_id'      => ['nullable', 'string', 'max:100'],
+            'titulo' => ['sometimes', 'required', 'string', 'max:300'],
+            'descripcion' => ['nullable', 'string'],
+            'plataforma' => ['nullable', 'string', 'max:50'],
+            'url_video' => ['sometimes', 'required', 'string', 'max:500'],
+            'video_id' => ['nullable', 'string', 'max:100'],
             'miniatura_url' => ['nullable', 'string', 'max:255'],
-            'duracion'      => ['nullable', 'string', 'max:20'],
-            'tipo'          => ['nullable', 'string', 'max:100'],
-            'programa_id'   => ['nullable', 'integer'],
-            'destacado'     => ['nullable', 'boolean'],
-            'orden'         => ['nullable', 'integer'],
-            'activo'        => ['nullable', 'boolean'],
+            'duracion' => ['nullable', 'string', 'max:20'],
+            'tipo' => ['nullable', 'string', 'max:100'],
+            'programa_id' => ['nullable', 'integer'],
+            'destacado' => ['nullable', 'boolean'],
+            'orden' => ['nullable', 'integer'],
+            'activo' => ['nullable', 'boolean'],
         ]);
         $data['updated_at'] = now();
         DB::table('web_galeria_video')->where('id', $id)->update($data);

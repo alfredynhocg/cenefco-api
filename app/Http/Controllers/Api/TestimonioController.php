@@ -12,14 +12,14 @@ class TestimonioController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = $request->get('query', '');
-        $size  = (int) $request->get('pageSize', 20);
-        $page  = (int) $request->get('pageIndex', 1);
+        $size = (int) $request->get('pageSize', 20);
+        $page = (int) $request->get('pageIndex', 1);
 
         $q = DB::table('web_testimonio');
         if ($query) {
             $q->where(function ($sq) use ($query) {
                 $sq->where('nombre', 'like', "%{$query}%")
-                   ->orWhere('testimonio', 'like', "%{$query}%");
+                    ->orWhere('testimonio', 'like', "%{$query}%");
             });
         }
         if ($request->has('estado')) {
@@ -30,7 +30,7 @@ class TestimonioController extends Controller
         }
 
         $total = $q->count();
-        $data  = $q->orderBy('orden')->orderByDesc('id')->offset(($page - 1) * $size)->limit($size)->get();
+        $data = $q->orderBy('orden')->orderByDesc('id')->offset(($page - 1) * $size)->limit($size)->get();
 
         return response()->json(['data' => $data, 'total' => $total]);
     }
@@ -48,25 +48,25 @@ class TestimonioController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'nombre'      => ['required', 'string', 'max:200'],
-            'cargo'       => ['nullable', 'string', 'max:200'],
-            'empresa'     => ['nullable', 'string', 'max:200'],
-            'testimonio'  => ['required', 'string'],
+            'nombre' => ['required', 'string', 'max:200'],
+            'cargo' => ['nullable', 'string', 'max:200'],
+            'empresa' => ['nullable', 'string', 'max:200'],
+            'testimonio' => ['required', 'string'],
             'calificacion' => ['nullable', 'integer', 'min:1', 'max:5'],
-            'foto_url'    => ['nullable', 'string', 'max:255'],
-            'foto_alt'    => ['nullable', 'string', 'max:255'],
+            'foto_url' => ['nullable', 'string', 'max:255'],
+            'foto_alt' => ['nullable', 'string', 'max:255'],
             'programa_id' => ['nullable', 'integer'],
-            'destacado'   => ['nullable', 'boolean'],
-            'orden'       => ['nullable', 'integer'],
-            'estado'      => ['nullable', 'string', 'max:50'],
+            'destacado' => ['nullable', 'boolean'],
+            'orden' => ['nullable', 'integer'],
+            'estado' => ['nullable', 'string', 'max:50'],
         ]);
         $data['calificacion'] = $request->integer('calificacion', 5);
-        $data['destacado']    = $request->boolean('destacado', false);
-        $data['orden']        = $request->integer('orden', 0);
-        $data['estado']       = $data['estado'] ?? 'publicado';
-        $data['created_at']   = now();
+        $data['destacado'] = $request->boolean('destacado', false);
+        $data['orden'] = $request->integer('orden', 0);
+        $data['estado'] = $data['estado'] ?? 'publicado';
+        $data['created_at'] = now();
 
-        $id  = DB::table('web_testimonio')->insertGetId($data);
+        $id = DB::table('web_testimonio')->insertGetId($data);
         $row = DB::table('web_testimonio')->find($id);
 
         return response()->json($row, 201);
@@ -80,17 +80,17 @@ class TestimonioController extends Controller
         }
 
         $data = $request->validate([
-            'nombre'      => ['sometimes', 'required', 'string', 'max:200'],
-            'cargo'       => ['nullable', 'string', 'max:200'],
-            'empresa'     => ['nullable', 'string', 'max:200'],
-            'testimonio'  => ['sometimes', 'required', 'string'],
+            'nombre' => ['sometimes', 'required', 'string', 'max:200'],
+            'cargo' => ['nullable', 'string', 'max:200'],
+            'empresa' => ['nullable', 'string', 'max:200'],
+            'testimonio' => ['sometimes', 'required', 'string'],
             'calificacion' => ['nullable', 'integer', 'min:1', 'max:5'],
-            'foto_url'    => ['nullable', 'string', 'max:255'],
-            'foto_alt'    => ['nullable', 'string', 'max:255'],
+            'foto_url' => ['nullable', 'string', 'max:255'],
+            'foto_alt' => ['nullable', 'string', 'max:255'],
             'programa_id' => ['nullable', 'integer'],
-            'destacado'   => ['nullable', 'boolean'],
-            'orden'       => ['nullable', 'integer'],
-            'estado'      => ['nullable', 'string', 'max:50'],
+            'destacado' => ['nullable', 'boolean'],
+            'orden' => ['nullable', 'integer'],
+            'estado' => ['nullable', 'string', 'max:50'],
         ]);
         $data['updated_at'] = now();
         DB::table('web_testimonio')->where('id', $id)->update($data);

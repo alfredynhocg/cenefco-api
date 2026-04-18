@@ -3,11 +3,10 @@
 namespace App\Infrastructure\WhatsApp\BotHandlers;
 
 use App\Infrastructure\Shared\Services\WhatsAppService;
-use App\Infrastructure\TramiteSolicitudes\Models\TramiteEtapa;
-use App\Infrastructure\TramiteSolicitudes\Models\TramiteSolicitud;
 use App\Infrastructure\WhatsApp\ConversationManager;
 use App\Infrastructure\WhatsApp\Enums\BotButton;
 use App\Infrastructure\WhatsApp\Enums\BotState;
+use Illuminate\Support\Facades\DB;
 
 class SeguimientoHandler
 {
@@ -17,49 +16,52 @@ class SeguimientoHandler
         private MenuHandler $menu,
     ) {}
 
-    public function pedirNumero(string $from): void
+    public function pedirCI(string $from): void
     {
         $this->wa->sendText($from,
-            "🔍 *Consulta de estado de trámite*\n\n".
-            "Escribe tu *número de seguimiento* o tu *número de CI* para buscar tu trámite.\n\n".
-            "_Ejemplo número: TRM-202604-00001_\n".
-            '_Ejemplo CI: 5821034_'
+            "🔍 *Consulta de Pre-inscripción*\n\n".
+            "Escribe tu *número de CI* para verificar el estado de tu solicitud.\n\n".
+            '_Ejemplo: 5821034_'
         );
-        $this->conv->setState($from, BotState::SEGUIMIENTO_TRAMITE->value);
+        $this->conv->setState($from, BotState::CONSULTA_CI->value);
     }
 
-    public function buscarPorNumero(string $from, string $texto): void
+    public function buscarPorCI(string $from, string $texto): void
     {
-        $texto = trim($texto);
+        $ci = trim(preg_replace('/[^0-9A-Za-z]/', '', $texto));
 
-        $solicitud = null;
+        if (strlen($ci) < 5) {
+            $this->wa->sendText($from, '⚠️ El CI ingresado no parece válido. Por favor escribe tu número de CI sin puntos ni guiones.');
+            $this->wa->sendButtons($from, '¿Qué deseas hacer?', [
+                ['id' => BotButton::INSCRIPCION->value, 'title' => '🔍 Intentar de nuevo'],
+                ['id' => BotButton::MENU->value,        'title' => '🏠 Menú principal'],
+            ]);
 
-        if (str_starts_with(strtoupper($texto), 'TRM-')) {
-            $solicitud = TramiteSolicitud::where('numero_seguimiento', strtoupper($texto))
-                ->with(['tramite', 'historial'])
-                ->first();
-        } else {
-            $solicitud = TramiteSolicitud::where('ci', $texto)
-                ->where('phone', $from)
-                ->with(['tramite', 'historial'])
-                ->orderByDesc('id')
-                ->first();
-
-            if (! $solicitud) {
-                $solicitud = TramiteSolicitud::where('ci', $texto)
-                    ->with(['tramite', 'historial'])
-                    ->orderByDesc('id')
-                    ->first();
-            }
+            return;
         }
 
-        if (! $solicitud) {
+        $preinscripciones = DB::table('web_preinscripcion')
+            ->where('ci', $ci)
+            ->join('t_programa', 'web_preinscripcion.programa_id', '=', 't_programa.id_programa')
+            ->orderByDesc('web_preinscripcion.id')
+            ->limit(5)
+            ->get([
+                'web_preinscripcion.id',
+                'web_preinscripcion.nombre',
+                'web_preinscripcion.apellido_paterno',
+                'web_preinscripcion.apellido_materno',
+                'web_preinscripcion.created_at',
+                't_programa.nombre_programa',
+            ]);
+
+        if ($preinscripciones->isEmpty()) {
             $this->wa->sendText($from,
-                "⚠️ No se encontro ningún trámite con *{$texto}*.\n\n".
-                'Verifica que hayas escrito correctamente el número de seguimiento (TRM-XXXXXX-XXXXX) o tu CI.'
+                "⚠️ No se encontró ninguna pre-inscripción con CI *{$ci}*.\n\n".
+                'Verifica que hayas completado el formulario de pre-inscripción en nuestro portal web.'
             );
             $this->wa->sendButtons($from, '¿Qué deseas hacer?', [
-                ['id' => BotButton::SEGUIMIENTO->value, 'title' => '🔍 Intentar de nuevo'],
+                ['id' => BotButton::INSCRIPCION->value, 'title' => '📝 Info de inscripción'],
+                ['id' => BotButton::SOPORTE->value,     'title' => '📞 Hablar con asesor'],
                 ['id' => BotButton::MENU->value,        'title' => '🏠 Menú principal'],
             ]);
             $this->conv->setState($from, BotState::MENU->value);
@@ -67,79 +69,27 @@ class SeguimientoHandler
             return;
         }
 
-        $this->enviarEstado($from, $solicitud);
-        $this->conv->setState($from, BotState::MENU->value);
-    }
+        $primera = $preinscripciones->first();
+        $nombreCompleto = trim("{$primera->nombre} {$primera->apellido_paterno} {$primera->apellido_materno}");
 
-    private function enviarEstado(string $from, TramiteSolicitud $solicitud): void
-    {
-        $etapas = TramiteEtapa::where('tramite_id', $solicitud->tramite_id)
-            ->orderBy('orden')
-            ->get();
+        $texto = "✅ *Pre-inscripción(es) encontrada(s)*\n\n";
+        $texto .= "👤 *Nombre:* {$nombreCompleto}\n\n";
 
-        $totalEtapas = $etapas->count();
-        $etapaActual = $solicitud->etapa_actual;
-
-        $estadoLabel = match ($solicitud->estado) {
-            'completado' => '✅ Completado',
-            'cancelado' => '❌ Cancelado',
-            default => '🔄 En proceso',
-        };
-
-        $progreso = $totalEtapas > 0 ? round(($etapaActual / $totalEtapas) * 100) : 0;
-        $barra = $this->barraProgreso($etapaActual, $totalEtapas);
-
-        $texto = "📋 *Estado de tu Trámite*\n\n";
-        $texto .= "📌 *Número:* {$solicitud->numero_seguimiento}\n";
-        $texto .= "📝 *Trámite:* {$solicitud->tramite->nombre}\n";
-        $texto .= "👤 *Solicitante:* {$solicitud->nombre_ciudadano}\n";
-        if ($solicitud->ci) {
-            $texto .= "🪪 *CI:* {$solicitud->ci}\n";
+        foreach ($preinscripciones as $i => $p) {
+            $fecha = $p->created_at ? date('d/m/Y', strtotime($p->created_at)) : '-';
+            $texto .= ($i + 1).". 📚 {$p->nombre_programa}\n";
+            $texto .= "   📅 Registrado: {$fecha}\n\n";
         }
-        $texto .= "📊 *Estado:* {$estadoLabel}\n\n";
-        $texto .= "*Progreso: {$progreso}% {$barra}*\n\n";
+
+        $texto .= '⏳ Nuestro equipo revisará tu solicitud y te contactará próximamente.';
 
         $this->wa->sendText($from, $texto);
 
-        $etapasTexto = "📍 *Etapas del trámite:*\n\n";
-        foreach ($etapas as $etapa) {
-            if ($etapa->orden < $etapaActual || ($etapa->orden === $etapaActual && $solicitud->estado === 'completado')) {
-                $icono = '✅';
-            } elseif ($etapa->orden === $etapaActual) {
-                $icono = '🔄';
-            } else {
-                $icono = '⬜';
-            }
-            $etapasTexto .= "{$icono} *{$etapa->orden}. {$etapa->nombre}*\n";
-            if ($etapa->orden === $etapaActual && $etapa->instruccion_ciudadano && $solicitud->estado !== 'completado') {
-                $etapasTexto .= "   _{$etapa->instruccion_ciudadano}_\n";
-            }
-        }
-
-        $historial = $solicitud->historial;
-        if ($historial && $historial->isNotEmpty()) {
-            $ultimo = $historial->last();
-            if ($ultimo->observacion) {
-                $etapasTexto .= "\n💬 *Última nota del funcionario:*\n_{$ultimo->observacion}_\n";
-            }
-        }
-
-        $this->wa->sendText($from, $etapasTexto);
-
         $this->wa->sendButtons($from, '¿Necesitas algo más?', [
-            ['id' => BotButton::SEGUIMIENTO->value, 'title' => '🔍 Otro trámite'],
-            ['id' => BotButton::MENU->value,        'title' => '🏠 Menú principal'],
+            ['id' => BotButton::SOPORTE->value, 'title' => '📞 Hablar con asesor'],
+            ['id' => BotButton::MENU->value,    'title' => '🏠 Menú principal'],
         ]);
-    }
 
-    private function barraProgreso(int $actual, int $total): string
-    {
-        if ($total === 0) {
-            return '';
-        }
-        $llenos = (int) round(($actual / $total) * 5);
-        $vacios = 5 - $llenos;
-
-        return str_repeat('🟩', $llenos).str_repeat('⬜', $vacios);
+        $this->conv->setState($from, BotState::MENU->value);
     }
 }

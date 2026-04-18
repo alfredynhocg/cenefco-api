@@ -2,25 +2,12 @@
 
 use App\Http\Controllers\Api\AjusteController;
 use App\Http\Controllers\Api\BannerPortalController;
-use App\Http\Controllers\Api\CategoriaNoticiaController;
-use App\Http\Controllers\Api\ContactoMunicipalController;
 use App\Http\Controllers\Api\DashboardController;
-use App\Http\Controllers\Api\DocumentoController;
 use App\Http\Controllers\Api\EtiquetaController;
 use App\Http\Controllers\Api\EventoController;
-use App\Http\Controllers\Api\EventoFotoController;
-use App\Http\Controllers\Api\FormularioController;
 use App\Http\Controllers\Api\MensajeContactoController;
-use App\Http\Controllers\Api\NoticiaController;
 use App\Http\Controllers\Api\RedSocialController;
-use App\Http\Controllers\Api\RequisitoController;
 use App\Http\Controllers\Api\RoleController;
-use App\Http\Controllers\Api\SecretariaController;
-use App\Http\Controllers\Api\SugerenciaReclamoController;
-use App\Http\Controllers\Api\TipoDocumentoTransparenciaController;
-use App\Http\Controllers\Api\TipoEventoController;
-use App\Http\Controllers\Api\TipoTramiteController;
-use App\Http\Controllers\Api\TramiteController;
 use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\WhatsAppAdminController;
 use Illuminate\Support\Facades\Route;
@@ -47,15 +34,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/roles/{id}', [RoleController::class, 'destroy'])
         ->middleware('permiso:usuarios.eliminar');
 
-    Route::get('/categorias-noticia', [CategoriaNoticiaController::class, 'index']);
-    Route::post('/categorias-noticia', [CategoriaNoticiaController::class, 'store'])
-        ->middleware('permiso:noticias.crear');
-    Route::get('/categorias-noticia/{id}', [CategoriaNoticiaController::class, 'show']);
-    Route::put('/categorias-noticia/{id}', [CategoriaNoticiaController::class, 'update'])
-        ->middleware('permiso:noticias.editar');
-    Route::delete('/categorias-noticia/{id}', [CategoriaNoticiaController::class, 'destroy'])
-        ->middleware('permiso:noticias.eliminar');
-
     Route::get('/etiquetas', [EtiquetaController::class, 'index']);
     Route::post('/etiquetas', [EtiquetaController::class, 'store'])
         ->middleware('permiso:noticias.crear');
@@ -65,90 +43,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/etiquetas/{id}', [EtiquetaController::class, 'destroy'])
         ->middleware('permiso:noticias.eliminar');
 
-    Route::get('/noticias', [NoticiaController::class, 'index']);
-    Route::post('/noticias', [NoticiaController::class, 'store'])
-        ->middleware('permiso:noticias.crear');
-    Route::get('/noticias/{id}', [NoticiaController::class, 'show']);
-    Route::get('/noticias/slug/{slug}', [NoticiaController::class, 'showBySlug']);
-    Route::put('/noticias/{id}', [NoticiaController::class, 'update'])
-        ->middleware('permiso:noticias.editar');
-    Route::delete('/noticias/{id}', [NoticiaController::class, 'destroy'])
-        ->middleware('permiso:noticias.eliminar');
-
-    Route::get('/secretarias', [SecretariaController::class, 'index']);
-    Route::post('/secretarias', [SecretariaController::class, 'store'])
-        ->middleware('permiso:secretarias.crear');
-    Route::get('/secretarias/{id}', [SecretariaController::class, 'show']);
-    Route::put('/secretarias/{id}', [SecretariaController::class, 'update'])
-        ->middleware('permiso:secretarias.editar');
-    Route::delete('/secretarias/{id}', [SecretariaController::class, 'destroy'])
-        ->middleware('permiso:secretarias.eliminar');
-
-
-    Route::get('/tipos-tramite', [TipoTramiteController::class, 'index']);
-    Route::post('/tipos-tramite', [TipoTramiteController::class, 'store'])
-        ->middleware('permiso:tramites.crear');
-    Route::get('/tipos-tramite/{id}', [TipoTramiteController::class, 'show']);
-    Route::put('/tipos-tramite/{id}', [TipoTramiteController::class, 'update'])
-        ->middleware('permiso:tramites.editar');
-    Route::delete('/tipos-tramite/{id}', [TipoTramiteController::class, 'destroy'])
-        ->middleware('permiso:tramites.eliminar');
-
-    Route::get('/tramites', [TramiteController::class, 'index']);
-    Route::post('/tramites', [TramiteController::class, 'store'])
-        ->middleware('permiso:tramites.crear');
-    Route::get('/tramites/{id}', [TramiteController::class, 'show']);
-    Route::put('/tramites/{id}', [TramiteController::class, 'update'])
-        ->middleware('permiso:tramites.editar');
-    Route::delete('/tramites/{id}', [TramiteController::class, 'destroy'])
-        ->middleware('permiso:tramites.eliminar');
-
-    Route::get('/tramites/{tramiteId}/requisitos', [RequisitoController::class, 'index']);
-    Route::post('/requisitos-tramite', [RequisitoController::class, 'store'])
-        ->middleware('permiso:tramites.crear');
-    Route::get('/requisitos-tramite/{id}', [RequisitoController::class, 'show']);
-    Route::put('/requisitos-tramite/{id}', [RequisitoController::class, 'update'])
-        ->middleware('permiso:tramites.editar');
-    Route::delete('/requisitos-tramite/{id}', [RequisitoController::class, 'destroy'])
-        ->middleware('permiso:tramites.eliminar');
-
-    Route::get('/tramites/{tramiteId}/formularios', [FormularioController::class, 'index']);
-    Route::get('/formularios-tramite', [\App\Http\Controllers\Api\FormularioTramitePortalController::class, 'index']);
-    Route::get('/formularios-tramite/{id}', [\App\Http\Controllers\Api\FormularioTramitePortalController::class, 'show']);
-    Route::post('/formularios-tramite', [\App\Http\Controllers\Api\FormularioTramitePortalController::class, 'store'])
-        ->middleware('permiso:tramites.crear');
-    Route::put('/formularios-tramite/{id}', [\App\Http\Controllers\Api\FormularioTramitePortalController::class, 'update'])
-        ->middleware('permiso:tramites.editar');
-    Route::delete('/formularios-tramite/{id}', [\App\Http\Controllers\Api\FormularioTramitePortalController::class, 'destroy'])
-        ->middleware('permiso:tramites.eliminar');
-
-    Route::get('/tipos-documento-transparencia', [TipoDocumentoTransparenciaController::class, 'index']);
-    Route::post('/tipos-documento-transparencia', [TipoDocumentoTransparenciaController::class, 'store'])
-        ->middleware('permiso:transparencia.crear');
-    Route::get('/tipos-documento-transparencia/{id}', [TipoDocumentoTransparenciaController::class, 'show']);
-    Route::put('/tipos-documento-transparencia/{id}', [TipoDocumentoTransparenciaController::class, 'update'])
-        ->middleware('permiso:transparencia.editar');
-    Route::delete('/tipos-documento-transparencia/{id}', [TipoDocumentoTransparenciaController::class, 'destroy'])
-        ->middleware('permiso:transparencia.eliminar');
-
-    Route::get('/documentos-transparencia', [DocumentoController::class, 'index']);
-    Route::post('/documentos-transparencia', [DocumentoController::class, 'store'])
-        ->middleware('permiso:transparencia.crear');
-    Route::get('/documentos-transparencia/{id}', [DocumentoController::class, 'show']);
-    Route::put('/documentos-transparencia/{id}', [DocumentoController::class, 'update'])
-        ->middleware('permiso:transparencia.editar');
-    Route::delete('/documentos-transparencia/{id}', [DocumentoController::class, 'destroy'])
-        ->middleware('permiso:transparencia.eliminar');
-
-    Route::get('/tipos-evento', [TipoEventoController::class, 'index']);
-    Route::post('/tipos-evento', [TipoEventoController::class, 'store'])
-        ->middleware('permiso:eventos.crear');
-    Route::get('/tipos-evento/{id}', [TipoEventoController::class, 'show']);
-    Route::put('/tipos-evento/{id}', [TipoEventoController::class, 'update'])
-        ->middleware('permiso:eventos.editar');
-    Route::delete('/tipos-evento/{id}', [TipoEventoController::class, 'destroy'])
-        ->middleware('permiso:eventos.eliminar');
-
     Route::get('/eventos', [EventoController::class, 'index']);
     Route::post('/eventos', [EventoController::class, 'store'])
         ->middleware('permiso:eventos.crear');
@@ -157,25 +51,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         ->middleware('permiso:eventos.editar');
     Route::delete('/eventos/{id}', [EventoController::class, 'destroy'])
         ->middleware('permiso:eventos.eliminar');
-
-    Route::get('/eventos/{eventoId}/fotos', [EventoFotoController::class, 'index']);
-    Route::post('/eventos-fotos', [EventoFotoController::class, 'store'])
-        ->middleware('permiso:eventos.crear');
-    Route::get('/eventos-fotos/{id}', [EventoFotoController::class, 'show']);
-    Route::put('/eventos-fotos/{id}', [EventoFotoController::class, 'update'])
-        ->middleware('permiso:eventos.editar');
-    Route::delete('/eventos-fotos/{id}', [EventoFotoController::class, 'destroy'])
-        ->middleware('permiso:eventos.eliminar');
-
-    Route::get('/sugerencias-reclamos', [SugerenciaReclamoController::class, 'index'])
-        ->middleware('permiso:sugerencias.ver');
-    Route::post('/sugerencias-reclamos', [SugerenciaReclamoController::class, 'store']); // Público?
-    Route::get('/sugerencias-reclamos/{id}', [SugerenciaReclamoController::class, 'show'])
-        ->middleware('permiso:sugerencias.ver');
-    Route::post('/sugerencias-reclamos/{id}/responder', [SugerenciaReclamoController::class, 'respond'])
-        ->middleware('permiso:sugerencias.editar');
-    Route::delete('/sugerencias-reclamos/{id}', [SugerenciaReclamoController::class, 'destroy'])
-        ->middleware('permiso:sugerencias.eliminar');
 
     Route::get('/preguntas-frecuentes', [\App\Http\Controllers\Api\PreguntaFrecuenteController::class, 'index'])
         ->middleware('permiso:contenido.ver');
@@ -190,22 +65,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/mensajes-contacto', [MensajeContactoController::class, 'index'])
         ->middleware('permiso:contacto.ver');
-    Route::post('/mensajes-contacto', [MensajeContactoController::class, 'store']); // Público
+    Route::post('/mensajes-contacto', [MensajeContactoController::class, 'store']);
     Route::get('/mensajes-contacto/{id}', [MensajeContactoController::class, 'show'])
         ->middleware('permiso:contacto.ver');
     Route::post('/mensajes-contacto/{id}/responder', [MensajeContactoController::class, 'respond'])
         ->middleware('permiso:contacto.editar');
     Route::delete('/mensajes-contacto/{id}', [MensajeContactoController::class, 'destroy'])
         ->middleware('permiso:contacto.eliminar');
-
-    Route::get('/contactos-municipales', [ContactoMunicipalController::class, 'index']);
-    Route::post('/contactos-municipales', [ContactoMunicipalController::class, 'store'])
-        ->middleware('permiso:configuracion.editar');
-    Route::get('/contactos-municipales/{id}', [ContactoMunicipalController::class, 'show']);
-    Route::put('/contactos-municipales/{id}', [ContactoMunicipalController::class, 'update'])
-        ->middleware('permiso:configuracion.editar');
-    Route::delete('/contactos-municipales/{id}', [ContactoMunicipalController::class, 'destroy'])
-        ->middleware('permiso:configuracion.eliminar');
 
     Route::get('/ajustes', [AjusteController::class, 'index']);
     Route::get('/ajustes/{key}', [AjusteController::class, 'show']);
@@ -221,6 +87,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/banners-portal/{id}', [BannerPortalController::class, 'destroy'])
         ->middleware('permiso:configuracion.eliminar');
 
+    Route::get('/asesores', [\App\Http\Controllers\Api\AsesorController::class, 'index']);
+    Route::post('/asesores', [\App\Http\Controllers\Api\AsesorController::class, 'store']);
+    Route::get('/asesores/{id}', [\App\Http\Controllers\Api\AsesorController::class, 'show']);
+    Route::put('/asesores/{id}', [\App\Http\Controllers\Api\AsesorController::class, 'update']);
+    Route::delete('/asesores/{id}', [\App\Http\Controllers\Api\AsesorController::class, 'destroy']);
+    Route::post('/whatsapp/conversaciones/{id}/asesor', [\App\Http\Controllers\Api\AsesorController::class, 'asignar']);
+
     Route::get('/whatsapp/conversaciones', [WhatsAppAdminController::class, 'conversaciones']);
     Route::get('/whatsapp/conversaciones/{id}/mensajes', [WhatsAppAdminController::class, 'mensajes']);
     Route::post('/whatsapp/conversaciones/{id}/etiquetas', [WhatsAppAdminController::class, 'asignarEtiquetas']);
@@ -230,103 +103,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/whatsapp/enviar-masivo', [WhatsAppAdminController::class, 'enviarMasivo']);
     Route::post('/whatsapp/enviar-media', [WhatsAppAdminController::class, 'enviarMedia']);
     Route::post('/whatsapp/plantilla', [WhatsAppAdminController::class, 'enviarPlantilla']);
-
     Route::get('/whatsapp/etiquetas', [WhatsAppAdminController::class, 'etiquetas']);
     Route::post('/whatsapp/etiquetas', [WhatsAppAdminController::class, 'crearEtiqueta']);
     Route::put('/whatsapp/etiquetas/{id}', [WhatsAppAdminController::class, 'actualizarEtiqueta']);
     Route::delete('/whatsapp/etiquetas/{id}', [WhatsAppAdminController::class, 'eliminarEtiqueta']);
 
-    Route::get('/tramite-solicitudes', [\App\Http\Controllers\Api\TramiteSolicitudController::class, 'index']);
-    Route::get('/tramite-solicitudes/{id}', [\App\Http\Controllers\Api\TramiteSolicitudController::class, 'show']);
-    Route::post('/tramite-solicitudes/{id}/avanzar', [\App\Http\Controllers\Api\TramiteSolicitudController::class, 'avanzar']);
-    Route::post('/tramite-solicitudes/{id}/cancelar', [\App\Http\Controllers\Api\TramiteSolicitudController::class, 'cancelar']);
-
-    Route::get('/tramites/{tramiteId}/etapas', [\App\Http\Controllers\Api\TramiteSolicitudController::class, 'etapasPorTramite']);
-    Route::post('/tramite-etapas', [\App\Http\Controllers\Api\TramiteSolicitudController::class, 'storeEtapa'])
-        ->middleware('permiso:tramites.editar');
-    Route::put('/tramite-etapas/{id}', [\App\Http\Controllers\Api\TramiteSolicitudController::class, 'updateEtapa'])
-        ->middleware('permiso:tramites.editar');
-    Route::delete('/tramite-etapas/{id}', [\App\Http\Controllers\Api\TramiteSolicitudController::class, 'destroyEtapa'])
-        ->middleware('permiso:tramites.eliminar');
-
-    Route::apiResource('unidades-responsables', \App\Http\Controllers\Api\UnidadResponsableController::class);
-
-    Route::get('/organigrama/latest', [\App\Http\Controllers\Api\OrganigramaController::class, 'latest']);
-    Route::apiResource('organigramas', \App\Http\Controllers\Api\OrganigramaController::class);
-
-    Route::apiResource('nomina-personal', \App\Http\Controllers\Api\NominaPersonalController::class)
-        ->middleware('permiso:transparencia.ver');
-
-    Route::get('/poa', [\App\Http\Controllers\Api\POAController::class, 'index']);
-    Route::post('/poa', [\App\Http\Controllers\Api\POAController::class, 'store'])
-        ->middleware('permiso:transparencia.crear');
-    Route::get('/poa/{poaId}/programas', [\App\Http\Controllers\Api\POAController::class, 'indexProgramas']);
-    Route::post('/programas-poa', [\App\Http\Controllers\Api\POAController::class, 'storePrograma'])
-        ->middleware('permiso:transparencia.crear');
-
-    Route::get('/presupuestos', [\App\Http\Controllers\Api\PresupuestoController::class, 'index']);
-    Route::post('/presupuestos', [\App\Http\Controllers\Api\PresupuestoController::class, 'store'])
-        ->middleware('permiso:transparencia.crear');
-    Route::get('/presupuestos/{presupuestoId}/partidas', [\App\Http\Controllers\Api\PresupuestoController::class, 'indexPartidas']);
-    Route::post('/partidas-presupuestarias', [\App\Http\Controllers\Api\PresupuestoController::class, 'storePartida'])
-        ->middleware('permiso:transparencia.crear');
-    Route::get('/presupuestos/{presupuestoId}/ejecuciones', [\App\Http\Controllers\Api\PresupuestoController::class, 'indexEjecuciones']);
-
-
-    Route::get('/tipos-norma', [\App\Http\Controllers\Api\TipoNormaController::class, 'index']);
-    Route::post('/tipos-norma', [\App\Http\Controllers\Api\TipoNormaController::class, 'store'])
-        ->middleware('permiso:transparencia.crear');
-    Route::get('/tipos-norma/{id}', [\App\Http\Controllers\Api\TipoNormaController::class, 'show']);
-    Route::put('/tipos-norma/{id}', [\App\Http\Controllers\Api\TipoNormaController::class, 'update'])
-        ->middleware('permiso:transparencia.editar');
-    Route::delete('/tipos-norma/{id}', [\App\Http\Controllers\Api\TipoNormaController::class, 'destroy'])
-        ->middleware('permiso:transparencia.eliminar');
-
-    Route::get('/normas', [\App\Http\Controllers\Api\NormaController::class, 'index']);
-    Route::post('/normas', [\App\Http\Controllers\Api\NormaController::class, 'store'])
-        ->middleware('permiso:transparencia.crear');
-    Route::get('/normas/{id}', [\App\Http\Controllers\Api\NormaController::class, 'show']);
-    Route::put('/normas/{id}', [\App\Http\Controllers\Api\NormaController::class, 'update'])
-        ->middleware('permiso:transparencia.editar');
-    Route::delete('/normas/{id}', [\App\Http\Controllers\Api\NormaController::class, 'destroy'])
-        ->middleware('permiso:transparencia.eliminar');
-
-
-    Route::get('/manuales-institucionales', [\App\Http\Controllers\Api\ManualInstitucionalController::class, 'index']);
-    Route::post('/manuales-institucionales', [\App\Http\Controllers\Api\ManualInstitucionalController::class, 'store'])
-        ->middleware('permiso:transparencia.crear');
-    Route::get('/manuales-institucionales/{id}', [\App\Http\Controllers\Api\ManualInstitucionalController::class, 'show']);
-    Route::put('/manuales-institucionales/{id}', [\App\Http\Controllers\Api\ManualInstitucionalController::class, 'update'])
-        ->middleware('permiso:transparencia.editar');
-    Route::delete('/manuales-institucionales/{id}', [\App\Http\Controllers\Api\ManualInstitucionalController::class, 'destroy'])
-        ->middleware('permiso:transparencia.eliminar');
-
-
-    Route::get('/planes-gobierno', [\App\Http\Controllers\Api\PlanGobiernoController::class, 'index']);
-    Route::post('/planes-gobierno', [\App\Http\Controllers\Api\PlanGobiernoController::class, 'store'])
-        ->middleware('permiso:transparencia.crear');
-    Route::get('/planes-gobierno/{id}', [\App\Http\Controllers\Api\PlanGobiernoController::class, 'show']);
-    Route::put('/planes-gobierno/{id}', [\App\Http\Controllers\Api\PlanGobiernoController::class, 'update'])
-        ->middleware('permiso:transparencia.editar');
-    Route::delete('/planes-gobierno/{id}', [\App\Http\Controllers\Api\PlanGobiernoController::class, 'destroy'])
-        ->middleware('permiso:transparencia.eliminar');
-
-    Route::get('/categorias-indicador', [\App\Http\Controllers\Api\IndicadorController::class, 'indexCategorias']);
-    Route::get('/indicadores', [\App\Http\Controllers\Api\IndicadorController::class, 'index']);
-    Route::post('/indicadores', [\App\Http\Controllers\Api\IndicadorController::class, 'store'])
-        ->middleware('permiso:transparencia.crear');
-    Route::get('/indicadores/{indicadorId}/valores', [\App\Http\Controllers\Api\IndicadorController::class, 'indexValores']);
-    Route::post('/valores-indicador', [\App\Http\Controllers\Api\IndicadorController::class, 'storeValor'])
-        ->middleware('permiso:transparencia.crear');
-
-    Route::get('/proyectos', [\App\Http\Controllers\Api\ProyectoController::class, 'index']);
-    Route::post('/proyectos', [\App\Http\Controllers\Api\ProyectoController::class, 'store'])
-        ->middleware('permiso:transparencia.crear');
-    Route::get('/proyectos/{proyectoId}/avances', [\App\Http\Controllers\Api\ProyectoController::class, 'indexAvances']);
-    Route::post('/avances-proyecto', [\App\Http\Controllers\Api\ProyectoController::class, 'storeAvance'])
-        ->middleware('permiso:transparencia.crear');
-
-    // Cursos (t_programa)
     Route::get('/cursos', [\App\Http\Controllers\Api\CursoController::class, 'index']);
     Route::post('/cursos', [\App\Http\Controllers\Api\CursoController::class, 'store'])
         ->middleware('permiso:contenido.crear');
@@ -336,7 +117,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/cursos/{id}', [\App\Http\Controllers\Api\CursoController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // Categorías de programa (web_categoria_programa)
     Route::get('/categorias-programa', [\App\Http\Controllers\Api\CategoriaProgramaController::class, 'index']);
     Route::post('/categorias-programa', [\App\Http\Controllers\Api\CategoriaProgramaController::class, 'store'])
         ->middleware('permiso:contenido.crear');
@@ -346,10 +126,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/categorias-programa/{id}', [\App\Http\Controllers\Api\CategoriaProgramaController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // Tipos de programa (t_tipoprograma)
     Route::get('/tipos-programa', [\App\Http\Controllers\Api\TipoProgramaController::class, 'index']);
 
-    // Preinscripciones
     Route::get('/preinscripciones', [\App\Http\Controllers\Api\PreinscripcionController::class, 'index'])
         ->middleware('permiso:inscripciones.ver');
     Route::get('/preinscripciones/{id}', [\App\Http\Controllers\Api\PreinscripcionController::class, 'show'])
@@ -359,7 +137,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/preinscripciones/{id}', [\App\Http\Controllers\Api\PreinscripcionController::class, 'destroy'])
         ->middleware('permiso:inscripciones.eliminar');
 
-    // Reseñas de programas
     Route::get('/resenas', [\App\Http\Controllers\Api\ResenaController::class, 'index'])
         ->middleware('permiso:contenido.ver');
     Route::get('/resenas/{id}', [\App\Http\Controllers\Api\ResenaController::class, 'show'])
@@ -369,7 +146,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/resenas/{id}', [\App\Http\Controllers\Api\ResenaController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // FAQs
     Route::get('/faqs', [\App\Http\Controllers\Api\FaqController::class, 'index']);
     Route::post('/faqs', [\App\Http\Controllers\Api\FaqController::class, 'store'])
         ->middleware('permiso:contenido.crear');
@@ -379,7 +155,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/faqs/{id}', [\App\Http\Controllers\Api\FaqController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // Cifras institucionales
     Route::get('/cifras-institucionales', [\App\Http\Controllers\Api\CifraInstitucionalController::class, 'index']);
     Route::post('/cifras-institucionales', [\App\Http\Controllers\Api\CifraInstitucionalController::class, 'store'])
         ->middleware('permiso:contenido.crear');
@@ -389,7 +164,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/cifras-institucionales/{id}', [\App\Http\Controllers\Api\CifraInstitucionalController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // Hitos institucionales
     Route::get('/hitos-institucionales', [\App\Http\Controllers\Api\HitoInstitucionalController::class, 'index']);
     Route::post('/hitos-institucionales', [\App\Http\Controllers\Api\HitoInstitucionalController::class, 'store'])
         ->middleware('permiso:contenido.crear');
@@ -399,7 +173,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/hitos-institucionales/{id}', [\App\Http\Controllers\Api\HitoInstitucionalController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // Catálogo: Expedido (departamentos Bolivia)
     Route::get('/expedido', [\App\Http\Controllers\Api\ExpedidoController::class, 'index']);
     Route::post('/expedido', [\App\Http\Controllers\Api\ExpedidoController::class, 'store'])
         ->middleware('permiso:contenido.crear');
@@ -409,7 +182,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/expedido/{id}', [\App\Http\Controllers\Api\ExpedidoController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // Catálogo: Grado Académico
     Route::get('/grados-academicos', [\App\Http\Controllers\Api\GradoAcademicoController::class, 'index']);
     Route::post('/grados-academicos', [\App\Http\Controllers\Api\GradoAcademicoController::class, 'store'])
         ->middleware('permiso:contenido.crear');
@@ -419,94 +191,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/grados-academicos/{id}', [\App\Http\Controllers\Api\GradoAcademicoController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    Route::get('/items', [\App\Http\Controllers\Api\ItemController::class, 'index']);
-    Route::post('/items', [\App\Http\Controllers\Api\ItemController::class, 'store']);
-    Route::get('/items/{id}', [\App\Http\Controllers\Api\ItemController::class, 'show']);
-    Route::put('/items/{id}', [\App\Http\Controllers\Api\ItemController::class, 'update']);
-    Route::delete('/items/{id}', [\App\Http\Controllers\Api\ItemController::class, 'destroy']);
-
-    Route::get('/indicadores-gestion', [\App\Http\Controllers\Api\IndicadorGestionController::class, 'index']);
-    Route::post('/indicadores-gestion', [\App\Http\Controllers\Api\IndicadorGestionController::class, 'store']);
-    Route::get('/indicadores-gestion/{id}', [\App\Http\Controllers\Api\IndicadorGestionController::class, 'show']);
-    Route::put('/indicadores-gestion/{id}', [\App\Http\Controllers\Api\IndicadorGestionController::class, 'update']);
-    Route::delete('/indicadores-gestion/{id}', [\App\Http\Controllers\Api\IndicadorGestionController::class, 'destroy']);
-
-
-    Route::get('/comunicados', [\App\Http\Controllers\Api\ComunicadoController::class, 'index']);
-    Route::post('/comunicados', [\App\Http\Controllers\Api\ComunicadoController::class, 'store']);
-    Route::get('/comunicados/{id}', [\App\Http\Controllers\Api\ComunicadoController::class, 'show']);
-    Route::put('/comunicados/{id}', [\App\Http\Controllers\Api\ComunicadoController::class, 'update']);
-    Route::delete('/comunicados/{id}', [\App\Http\Controllers\Api\ComunicadoController::class, 'destroy']);
-
-    Route::get('/directorio-institucional', [\App\Http\Controllers\Api\DirectorioInstitucionalController::class, 'index']);
-    Route::post('/directorio-institucional', [\App\Http\Controllers\Api\DirectorioInstitucionalController::class, 'store']);
-    Route::get('/directorio-institucional/{id}', [\App\Http\Controllers\Api\DirectorioInstitucionalController::class, 'show']);
-    Route::put('/directorio-institucional/{id}', [\App\Http\Controllers\Api\DirectorioInstitucionalController::class, 'update']);
-    Route::delete('/directorio-institucional/{id}', [\App\Http\Controllers\Api\DirectorioInstitucionalController::class, 'destroy']);
-
-    Route::get('/consultas-ciudadanas', [\App\Http\Controllers\Api\ConsultaCiudadanaController::class, 'index']);
-    Route::post('/consultas-ciudadanas', [\App\Http\Controllers\Api\ConsultaCiudadanaController::class, 'store']);
-    Route::get('/consultas-ciudadanas/{id}', [\App\Http\Controllers\Api\ConsultaCiudadanaController::class, 'show']);
-    Route::put('/consultas-ciudadanas/{id}/responder', [\App\Http\Controllers\Api\ConsultaCiudadanaController::class, 'responder']);
-    Route::delete('/consultas-ciudadanas/{id}', [\App\Http\Controllers\Api\ConsultaCiudadanaController::class, 'destroy']);
-
-
     Route::get('/config-sitio', [\App\Http\Controllers\Api\ConfigSitioController::class, 'show']);
     Route::put('/config-sitio', [\App\Http\Controllers\Api\ConfigSitioController::class, 'update'])
         ->middleware('permiso:transparencia.crear');
 
-    Route::get('/galerias', [\App\Http\Controllers\Api\GaleriaController::class, 'index']);
-    Route::post('/galerias', [\App\Http\Controllers\Api\GaleriaController::class, 'store']);
-    Route::get('/galerias/{id}', [\App\Http\Controllers\Api\GaleriaController::class, 'show']);
-    Route::put('/galerias/{id}', [\App\Http\Controllers\Api\GaleriaController::class, 'update']);
-    Route::delete('/galerias/{id}', [\App\Http\Controllers\Api\GaleriaController::class, 'destroy']);
-
-    Route::get('/galeria-items', [\App\Http\Controllers\Api\GaleriaItemController::class, 'index']);
-    Route::post('/galeria-items', [\App\Http\Controllers\Api\GaleriaItemController::class, 'store']);
-    Route::get('/galeria-items/{id}', [\App\Http\Controllers\Api\GaleriaItemController::class, 'show']);
-    Route::put('/galeria-items/{id}', [\App\Http\Controllers\Api\GaleriaItemController::class, 'update']);
-    Route::delete('/galeria-items/{id}', [\App\Http\Controllers\Api\GaleriaItemController::class, 'destroy']);
-
-    Route::get('/menus', [\App\Http\Controllers\Api\MenuController::class, 'index']);
-    Route::post('/menus', [\App\Http\Controllers\Api\MenuController::class, 'store']);
-    Route::get('/menus/{id}', [\App\Http\Controllers\Api\MenuController::class, 'show']);
-    Route::put('/menus/{id}', [\App\Http\Controllers\Api\MenuController::class, 'update']);
-    Route::delete('/menus/{id}', [\App\Http\Controllers\Api\MenuController::class, 'destroy']);
-
-    Route::get('/menu-items', [\App\Http\Controllers\Api\MenuItemController::class, 'index']);
-    Route::post('/menu-items', [\App\Http\Controllers\Api\MenuItemController::class, 'store']);
-    Route::get('/menu-items/{id}', [\App\Http\Controllers\Api\MenuItemController::class, 'show']);
-    Route::put('/menu-items/{id}', [\App\Http\Controllers\Api\MenuItemController::class, 'update']);
-    Route::delete('/menu-items/{id}', [\App\Http\Controllers\Api\MenuItemController::class, 'destroy']);
-
-    Route::get('/himnos', [\App\Http\Controllers\Api\HimnoController::class, 'index']);
-    Route::get('/himnos/{id}', [\App\Http\Controllers\Api\HimnoController::class, 'show']);
-    Route::post('/himnos', [\App\Http\Controllers\Api\HimnoController::class, 'store'])
-        ->middleware('permiso:transparencia.crear');
-    Route::put('/himnos/{id}', [\App\Http\Controllers\Api\HimnoController::class, 'update'])
-        ->middleware('permiso:transparencia.crear');
-    Route::delete('/himnos/{id}', [\App\Http\Controllers\Api\HimnoController::class, 'destroy'])
-        ->middleware('permiso:transparencia.crear');
-
-    Route::get('/decretos-municipales', [\App\Http\Controllers\Api\DecretoMunicipalController::class, 'index']);
-    Route::post('/decretos-municipales', [\App\Http\Controllers\Api\DecretoMunicipalController::class, 'store'])
-        ->middleware('permiso:decretos.crear');
-    Route::get('/decretos-municipales/{id}', [\App\Http\Controllers\Api\DecretoMunicipalController::class, 'show']);
-    Route::put('/decretos-municipales/{id}', [\App\Http\Controllers\Api\DecretoMunicipalController::class, 'update'])
-        ->middleware('permiso:decretos.editar');
-    Route::delete('/decretos-municipales/{id}', [\App\Http\Controllers\Api\DecretoMunicipalController::class, 'destroy'])
-        ->middleware('permiso:decretos.eliminar');
-
-    Route::get('/informes-auditoria', [\App\Http\Controllers\Api\InformeAuditoriaController::class, 'index']);
-    Route::post('/informes-auditoria', [\App\Http\Controllers\Api\InformeAuditoriaController::class, 'store'])
-        ->middleware('permiso:informes-auditoria.crear');
-    Route::get('/informes-auditoria/{id}', [\App\Http\Controllers\Api\InformeAuditoriaController::class, 'show']);
-    Route::put('/informes-auditoria/{id}', [\App\Http\Controllers\Api\InformeAuditoriaController::class, 'update'])
-        ->middleware('permiso:informes-auditoria.editar');
-    Route::delete('/informes-auditoria/{id}', [\App\Http\Controllers\Api\InformeAuditoriaController::class, 'destroy'])
-        ->middleware('permiso:informes-auditoria.eliminar');
-
-    // Permisos del sistema
     Route::get('/permisos', [\App\Http\Controllers\Api\PermisoController::class, 'index'])
         ->middleware('permiso:usuarios.ver');
     Route::post('/permisos', [\App\Http\Controllers\Api\PermisoController::class, 'store'])
@@ -518,22 +206,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/permisos/{id}', [\App\Http\Controllers\Api\PermisoController::class, 'destroy'])
         ->middleware('permiso:usuarios.eliminar');
 
-    // Portal Indicadores de Gestión
-    Route::get('/portal-indicadores', [\App\Http\Controllers\Api\PortalIndicadorController::class, 'index']);
-    Route::post('/portal-indicadores', [\App\Http\Controllers\Api\PortalIndicadorController::class, 'store'])
-        ->middleware('permiso:transparencia.crear');
-    Route::get('/portal-indicadores/{id}', [\App\Http\Controllers\Api\PortalIndicadorController::class, 'show']);
-    Route::put('/portal-indicadores/{id}', [\App\Http\Controllers\Api\PortalIndicadorController::class, 'update'])
-        ->middleware('permiso:transparencia.editar');
-    Route::delete('/portal-indicadores/{id}', [\App\Http\Controllers\Api\PortalIndicadorController::class, 'destroy'])
-        ->middleware('permiso:transparencia.eliminar');
-
-    // Configuración general (settings)
     Route::get('/settings', [\App\Http\Controllers\Api\SettingsController::class, 'index']);
     Route::put('/settings', [\App\Http\Controllers\Api\SettingsController::class, 'update'])
         ->middleware('permiso:configuracion.editar');
 
-    // Suscriptores
     Route::get('/suscriptores', [\App\Http\Controllers\Api\SuscriptorController::class, 'index'])
         ->middleware('permiso:contenido.ver');
     Route::post('/suscriptores', [\App\Http\Controllers\Api\SuscriptorController::class, 'store']);
@@ -544,7 +220,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/suscriptores/{id}', [\App\Http\Controllers\Api\SuscriptorController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // Testimonios
     Route::get('/testimonios', [\App\Http\Controllers\Api\TestimonioController::class, 'index']);
     Route::post('/testimonios', [\App\Http\Controllers\Api\TestimonioController::class, 'store'])
         ->middleware('permiso:contenido.crear');
@@ -554,7 +229,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/testimonios/{id}', [\App\Http\Controllers\Api\TestimonioController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // Aliados / Partners
     Route::get('/aliados', [\App\Http\Controllers\Api\AliadoController::class, 'index']);
     Route::post('/aliados', [\App\Http\Controllers\Api\AliadoController::class, 'store'])
         ->middleware('permiso:contenido.crear');
@@ -564,7 +238,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/aliados/{id}', [\App\Http\Controllers\Api\AliadoController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // Docentes perfil web
     Route::get('/docentes-perfil', [\App\Http\Controllers\Api\DocentePerfilController::class, 'index']);
     Route::post('/docentes-perfil', [\App\Http\Controllers\Api\DocentePerfilController::class, 'store'])
         ->middleware('permiso:contenido.crear');
@@ -574,7 +247,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/docentes-perfil/{id}', [\App\Http\Controllers\Api\DocentePerfilController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // Popups
     Route::get('/popups', [\App\Http\Controllers\Api\PopupController::class, 'index']);
     Route::post('/popups', [\App\Http\Controllers\Api\PopupController::class, 'store'])
         ->middleware('permiso:configuracion.editar');
@@ -584,7 +256,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/popups/{id}', [\App\Http\Controllers\Api\PopupController::class, 'destroy'])
         ->middleware('permiso:configuracion.eliminar');
 
-    // WhatsApp Grupos (por impartición)
     Route::get('/whatsapp-grupos', [\App\Http\Controllers\Api\WhatsappGrupoController::class, 'index']);
     Route::post('/whatsapp-grupos', [\App\Http\Controllers\Api\WhatsappGrupoController::class, 'store'])
         ->middleware('permiso:contenido.crear');
@@ -594,7 +265,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/whatsapp-grupos/{id}', [\App\Http\Controllers\Api\WhatsappGrupoController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // Categorías de galería
     Route::get('/galeria-categorias', [\App\Http\Controllers\Api\GaleriaCategoriaController::class, 'index']);
     Route::post('/galeria-categorias', [\App\Http\Controllers\Api\GaleriaCategoriaController::class, 'store'])
         ->middleware('permiso:contenido.crear');
@@ -604,7 +274,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/galeria-categorias/{id}', [\App\Http\Controllers\Api\GaleriaCategoriaController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // Acreditaciones
     Route::get('/acreditaciones', [\App\Http\Controllers\Api\AcreditacionController::class, 'index']);
     Route::post('/acreditaciones', [\App\Http\Controllers\Api\AcreditacionController::class, 'store'])
         ->middleware('permiso:contenido.crear');
@@ -614,7 +283,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/acreditaciones/{id}', [\App\Http\Controllers\Api\AcreditacionController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // Notas de prensa
     Route::get('/notas-prensa', [\App\Http\Controllers\Api\NotaPrensaController::class, 'index']);
     Route::post('/notas-prensa', [\App\Http\Controllers\Api\NotaPrensaController::class, 'store'])
         ->middleware('permiso:contenido.crear');
@@ -624,7 +292,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/notas-prensa/{id}', [\App\Http\Controllers\Api\NotaPrensaController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // Descargables
     Route::get('/descargables', [\App\Http\Controllers\Api\DescargableController::class, 'index']);
     Route::post('/descargables', [\App\Http\Controllers\Api\DescargableController::class, 'store'])
         ->middleware('permiso:contenido.crear');
@@ -634,7 +301,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/descargables/{id}', [\App\Http\Controllers\Api\DescargableController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // Galería de videos
     Route::get('/galeria-videos', [\App\Http\Controllers\Api\GaleriaVideoController::class, 'index']);
     Route::post('/galeria-videos', [\App\Http\Controllers\Api\GaleriaVideoController::class, 'store'])
         ->middleware('permiso:contenido.crear');
@@ -644,7 +310,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/galeria-videos/{id}', [\App\Http\Controllers\Api\GaleriaVideoController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // Calendario académico
     Route::get('/calendario-academico', [\App\Http\Controllers\Api\CalendarioAcademicoController::class, 'index']);
     Route::post('/calendario-academico', [\App\Http\Controllers\Api\CalendarioAcademicoController::class, 'store'])
         ->middleware('permiso:contenido.crear');
@@ -654,7 +319,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/calendario-academico/{id}', [\App\Http\Controllers\Api\CalendarioAcademicoController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // Redirecciones
     Route::get('/redirecciones', [\App\Http\Controllers\Api\RedireccionController::class, 'index'])
         ->middleware('permiso:configuracion.editar');
     Route::post('/redirecciones', [\App\Http\Controllers\Api\RedireccionController::class, 'store'])
@@ -666,7 +330,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/redirecciones/{id}', [\App\Http\Controllers\Api\RedireccionController::class, 'destroy'])
         ->middleware('permiso:configuracion.eliminar');
 
-    // Descuentos y promociones
     Route::get('/descuentos-promociones', [\App\Http\Controllers\Api\DescuentoPromocionController::class, 'index']);
     Route::post('/descuentos-promociones', [\App\Http\Controllers\Api\DescuentoPromocionController::class, 'store'])
         ->middleware('permiso:contenido.crear');
@@ -676,7 +339,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/descuentos-promociones/{id}', [\App\Http\Controllers\Api\DescuentoPromocionController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // Plantillas de certificados
     Route::get('/cert-plantillas', [\App\Http\Controllers\Api\CertPlantillaController::class, 'index']);
     Route::post('/cert-plantillas', [\App\Http\Controllers\Api\CertPlantillaController::class, 'store'])
         ->middleware('permiso:contenido.crear');
@@ -686,7 +348,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/cert-plantillas/{id}', [\App\Http\Controllers\Api\CertPlantillaController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // Campos de plantillas de certificados
     Route::get('/cert-plantilla-campos', [\App\Http\Controllers\Api\CertPlantillaCampoController::class, 'index']);
     Route::post('/cert-plantilla-campos', [\App\Http\Controllers\Api\CertPlantillaCampoController::class, 'store'])
         ->middleware('permiso:contenido.crear');
@@ -696,7 +357,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/cert-plantilla-campos/{id}', [\App\Http\Controllers\Api\CertPlantillaCampoController::class, 'destroy'])
         ->middleware('permiso:contenido.eliminar');
 
-    // Lista de aprobados
     Route::get('/lista-aprobados', [\App\Http\Controllers\Api\ListaAprobadosController::class, 'index'])
         ->middleware('permiso:inscripciones.ver');
     Route::post('/lista-aprobados', [\App\Http\Controllers\Api\ListaAprobadosController::class, 'store'])
@@ -708,7 +368,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/lista-aprobados/{id}', [\App\Http\Controllers\Api\ListaAprobadosController::class, 'destroy'])
         ->middleware('permiso:inscripciones.eliminar');
 
-    // Certificados
     Route::get('/certificados', [\App\Http\Controllers\Api\CertificadoController::class, 'index'])
         ->middleware('permiso:inscripciones.ver');
     Route::post('/certificados', [\App\Http\Controllers\Api\CertificadoController::class, 'store'])
@@ -720,86 +379,72 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/certificados/{id}', [\App\Http\Controllers\Api\CertificadoController::class, 'destroy'])
         ->middleware('permiso:inscripciones.eliminar');
 
-    // Verificaciones de certificados (log de consultas)
     Route::get('/cert-verificaciones', [\App\Http\Controllers\Api\CertVerificacionController::class, 'index'])
         ->middleware('permiso:inscripciones.ver');
     Route::post('/cert-verificaciones', [\App\Http\Controllers\Api\CertVerificacionController::class, 'store']);
     Route::get('/cert-verificaciones/{id}', [\App\Http\Controllers\Api\CertVerificacionController::class, 'show'])
         ->middleware('permiso:inscripciones.ver');
 
-    // ── Sistema Académico SENEFCO (t_* tables) ──────────────────────────────
-
-    // Carreras
     Route::get('/carreras', [\App\Http\Controllers\Api\CarreraController::class, 'index']);
     Route::post('/carreras', [\App\Http\Controllers\Api\CarreraController::class, 'store']);
     Route::get('/carreras/{id}', [\App\Http\Controllers\Api\CarreraController::class, 'show']);
     Route::put('/carreras/{id}', [\App\Http\Controllers\Api\CarreraController::class, 'update']);
     Route::delete('/carreras/{id}', [\App\Http\Controllers\Api\CarreraController::class, 'destroy']);
 
-    // Materias
     Route::get('/materias', [\App\Http\Controllers\Api\MateriaController::class, 'index']);
     Route::post('/materias', [\App\Http\Controllers\Api\MateriaController::class, 'store']);
     Route::get('/materias/{id}', [\App\Http\Controllers\Api\MateriaController::class, 'show']);
     Route::put('/materias/{id}', [\App\Http\Controllers\Api\MateriaController::class, 'update']);
     Route::delete('/materias/{id}', [\App\Http\Controllers\Api\MateriaController::class, 'destroy']);
 
-    // Usuarios académicos (t_usuario)
     Route::get('/usuarios-academicos', [\App\Http\Controllers\Api\UsuarioAcademicoController::class, 'index']);
     Route::post('/usuarios-academicos', [\App\Http\Controllers\Api\UsuarioAcademicoController::class, 'store']);
     Route::get('/usuarios-academicos/{id}', [\App\Http\Controllers\Api\UsuarioAcademicoController::class, 'show']);
     Route::put('/usuarios-academicos/{id}', [\App\Http\Controllers\Api\UsuarioAcademicoController::class, 'update']);
     Route::delete('/usuarios-academicos/{id}', [\App\Http\Controllers\Api\UsuarioAcademicoController::class, 'destroy']);
 
-    // Imparticiones (docente + materia + periodo)
     Route::get('/imparticiones', [\App\Http\Controllers\Api\ImparteController::class, 'index']);
     Route::post('/imparticiones', [\App\Http\Controllers\Api\ImparteController::class, 'store']);
     Route::get('/imparticiones/{id}', [\App\Http\Controllers\Api\ImparteController::class, 'show']);
     Route::put('/imparticiones/{id}', [\App\Http\Controllers\Api\ImparteController::class, 'update']);
     Route::delete('/imparticiones/{id}', [\App\Http\Controllers\Api\ImparteController::class, 'destroy']);
 
-    // Inscripciones
     Route::get('/inscripciones', [\App\Http\Controllers\Api\InscripcionController::class, 'index']);
     Route::post('/inscripciones', [\App\Http\Controllers\Api\InscripcionController::class, 'store']);
     Route::get('/inscripciones/{id}', [\App\Http\Controllers\Api\InscripcionController::class, 'show']);
     Route::put('/inscripciones/{id}', [\App\Http\Controllers\Api\InscripcionController::class, 'update']);
     Route::delete('/inscripciones/{id}', [\App\Http\Controllers\Api\InscripcionController::class, 'destroy']);
 
-    // Notas académicas
     Route::get('/notas-academicas', [\App\Http\Controllers\Api\NotaController::class, 'index']);
     Route::post('/notas-academicas', [\App\Http\Controllers\Api\NotaController::class, 'store']);
     Route::get('/notas-academicas/{id}', [\App\Http\Controllers\Api\NotaController::class, 'show']);
     Route::put('/notas-academicas/{id}', [\App\Http\Controllers\Api\NotaController::class, 'update']);
     Route::delete('/notas-academicas/{id}', [\App\Http\Controllers\Api\NotaController::class, 'destroy']);
 
-    // Pagos académicos
     Route::get('/pagos-academicos', [\App\Http\Controllers\Api\PagoController::class, 'index']);
     Route::post('/pagos-academicos', [\App\Http\Controllers\Api\PagoController::class, 'store']);
     Route::get('/pagos-academicos/{id}', [\App\Http\Controllers\Api\PagoController::class, 'show']);
     Route::put('/pagos-academicos/{id}', [\App\Http\Controllers\Api\PagoController::class, 'update']);
     Route::delete('/pagos-academicos/{id}', [\App\Http\Controllers\Api\PagoController::class, 'destroy']);
 
-    // Horarios académicos
     Route::get('/horarios-academicos', [\App\Http\Controllers\Api\HorarioController::class, 'index']);
     Route::post('/horarios-academicos', [\App\Http\Controllers\Api\HorarioController::class, 'store']);
     Route::get('/horarios-academicos/{id}', [\App\Http\Controllers\Api\HorarioController::class, 'show']);
     Route::put('/horarios-academicos/{id}', [\App\Http\Controllers\Api\HorarioController::class, 'update']);
     Route::delete('/horarios-academicos/{id}', [\App\Http\Controllers\Api\HorarioController::class, 'destroy']);
 
-    // Planes académicos
     Route::get('/planes-academicos', [\App\Http\Controllers\Api\PlanAcademicoController::class, 'index']);
     Route::post('/planes-academicos', [\App\Http\Controllers\Api\PlanAcademicoController::class, 'store']);
     Route::get('/planes-academicos/{id}', [\App\Http\Controllers\Api\PlanAcademicoController::class, 'show']);
     Route::put('/planes-academicos/{id}', [\App\Http\Controllers\Api\PlanAcademicoController::class, 'update']);
     Route::delete('/planes-academicos/{id}', [\App\Http\Controllers\Api\PlanAcademicoController::class, 'destroy']);
 
-    // Catálogos académicos genéricos (ciudades, tipos-pago, universidades, ocupaciones, etc.)
     Route::get('/catalogo-academico/{catalogo}', [\App\Http\Controllers\Api\CatalogoAcademicoController::class, 'index']);
     Route::post('/catalogo-academico/{catalogo}', [\App\Http\Controllers\Api\CatalogoAcademicoController::class, 'store']);
     Route::get('/catalogo-academico/{catalogo}/{id}', [\App\Http\Controllers\Api\CatalogoAcademicoController::class, 'show']);
     Route::put('/catalogo-academico/{catalogo}/{id}', [\App\Http\Controllers\Api\CatalogoAcademicoController::class, 'update']);
     Route::delete('/catalogo-academico/{catalogo}/{id}', [\App\Http\Controllers\Api\CatalogoAcademicoController::class, 'destroy']);
 
-    // Publicaciones académicas
     Route::get('/articulos', [\App\Http\Controllers\Api\ArticuloController::class, 'index']);
     Route::post('/articulos', [\App\Http\Controllers\Api\ArticuloController::class, 'store']);
     Route::get('/articulos/{id}', [\App\Http\Controllers\Api\ArticuloController::class, 'show']);
@@ -842,14 +487,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/revistas-cientificas/{id}', [\App\Http\Controllers\Api\RevistaCientificaController::class, 'update']);
     Route::delete('/revistas-cientificas/{id}', [\App\Http\Controllers\Api\RevistaCientificaController::class, 'destroy']);
 
-    // Programas académicos
     Route::get('/programas-academicos', [\App\Http\Controllers\Api\ProgramaAcademicoController::class, 'index']);
     Route::post('/programas-academicos', [\App\Http\Controllers\Api\ProgramaAcademicoController::class, 'store']);
     Route::get('/programas-academicos/{id}', [\App\Http\Controllers\Api\ProgramaAcademicoController::class, 'show']);
     Route::put('/programas-academicos/{id}', [\App\Http\Controllers\Api\ProgramaAcademicoController::class, 'update']);
     Route::delete('/programas-academicos/{id}', [\App\Http\Controllers\Api\ProgramaAcademicoController::class, 'destroy']);
 
-    // Relaciones curriculares
     Route::get('/materias-plan', [\App\Http\Controllers\Api\MateriaPlanController::class, 'index']);
     Route::post('/materias-plan', [\App\Http\Controllers\Api\MateriaPlanController::class, 'store']);
     Route::get('/materias-plan/{id}', [\App\Http\Controllers\Api\MateriaPlanController::class, 'show']);
@@ -868,7 +511,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/tipos-postgrado/{id}', [\App\Http\Controllers\Api\TipoPostgradoController::class, 'update']);
     Route::delete('/tipos-postgrado/{id}', [\App\Http\Controllers\Api\TipoPostgradoController::class, 'destroy']);
 
-    // Pagos y documentos
     Route::get('/fechas-pago', [\App\Http\Controllers\Api\FechaPagoController::class, 'index']);
     Route::post('/fechas-pago', [\App\Http\Controllers\Api\FechaPagoController::class, 'store']);
     Route::get('/fechas-pago/{id}', [\App\Http\Controllers\Api\FechaPagoController::class, 'show']);
@@ -893,7 +535,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/ayudas/{id}', [\App\Http\Controllers\Api\AyudaController::class, 'update']);
     Route::delete('/ayudas/{id}', [\App\Http\Controllers\Api\AyudaController::class, 'destroy']);
 
-    // Cartas y correspondencia
     Route::get('/cartas', [\App\Http\Controllers\Api\CartaController::class, 'index']);
     Route::post('/cartas', [\App\Http\Controllers\Api\CartaController::class, 'store']);
     Route::get('/cartas/{id}', [\App\Http\Controllers\Api\CartaController::class, 'show']);
@@ -912,7 +553,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/cartas-generadas/{id}', [\App\Http\Controllers\Api\CartaGenController::class, 'update']);
     Route::delete('/cartas-generadas/{id}', [\App\Http\Controllers\Api\CartaGenController::class, 'destroy']);
 
-    // Formularios académicos
     Route::get('/formularios-academicos', [\App\Http\Controllers\Api\FormularioAcademicoController::class, 'index']);
     Route::post('/formularios-academicos', [\App\Http\Controllers\Api\FormularioAcademicoController::class, 'store']);
     Route::get('/formularios-academicos/{id}', [\App\Http\Controllers\Api\FormularioAcademicoController::class, 'show']);
@@ -931,14 +571,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/tests-academicos/{id}', [\App\Http\Controllers\Api\TestAcademicoController::class, 'update']);
     Route::delete('/tests-academicos/{id}', [\App\Http\Controllers\Api\TestAcademicoController::class, 'destroy']);
 
-    // Grupos y permisos
     Route::get('/grupos-academicos', [\App\Http\Controllers\Api\GrupoAcademicoController::class, 'index']);
     Route::post('/grupos-academicos', [\App\Http\Controllers\Api\GrupoAcademicoController::class, 'store']);
     Route::get('/grupos-academicos/{id}', [\App\Http\Controllers\Api\GrupoAcademicoController::class, 'show']);
     Route::put('/grupos-academicos/{id}', [\App\Http\Controllers\Api\GrupoAcademicoController::class, 'update']);
     Route::delete('/grupos-academicos/{id}', [\App\Http\Controllers\Api\GrupoAcademicoController::class, 'destroy']);
 
-    // Historial y evaluación
     Route::get('/historial', [\App\Http\Controllers\Api\HistorialController::class, 'index']);
     Route::post('/historial', [\App\Http\Controllers\Api\HistorialController::class, 'store']);
     Route::get('/historial/{id}', [\App\Http\Controllers\Api\HistorialController::class, 'show']);
@@ -951,7 +589,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/hojas-evaluacion/{id}', [\App\Http\Controllers\Api\HojaEvaluacionController::class, 'update']);
     Route::delete('/hojas-evaluacion/{id}', [\App\Http\Controllers\Api\HojaEvaluacionController::class, 'destroy']);
 
-    // Moodle
     Route::get('/moodles', [\App\Http\Controllers\Api\MoodleController::class, 'index']);
     Route::post('/moodles', [\App\Http\Controllers\Api\MoodleController::class, 'store']);
     Route::get('/moodles/{id}', [\App\Http\Controllers\Api\MoodleController::class, 'show']);
@@ -982,7 +619,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/usuarios-moodle/{id}', [\App\Http\Controllers\Api\UsuarioMoodleController::class, 'update']);
     Route::delete('/usuarios-moodle/{id}', [\App\Http\Controllers\Api\UsuarioMoodleController::class, 'destroy']);
 
-    // Relaciones usuario
     Route::get('/usuarios-plan', [\App\Http\Controllers\Api\UsuarioPlanController::class, 'index']);
     Route::post('/usuarios-plan', [\App\Http\Controllers\Api\UsuarioPlanController::class, 'store']);
     Route::get('/usuarios-plan/{id}', [\App\Http\Controllers\Api\UsuarioPlanController::class, 'show']);
@@ -1007,7 +643,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/usuarios-tipoprograma/{id}', [\App\Http\Controllers\Api\UsuarioTipoProgramaController::class, 'update']);
     Route::delete('/usuarios-tipoprograma/{id}', [\App\Http\Controllers\Api\UsuarioTipoProgramaController::class, 'destroy']);
 
-    // Configuración y CMS académico
     Route::get('/configuracion-academica', [\App\Http\Controllers\Api\ConfiguracionAcademicaController::class, 'index']);
     Route::post('/configuracion-academica', [\App\Http\Controllers\Api\ConfiguracionAcademicaController::class, 'store']);
     Route::get('/configuracion-academica/{id}', [\App\Http\Controllers\Api\ConfiguracionAcademicaController::class, 'show']);
@@ -1050,7 +685,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/secciones-bloque/{id}', [\App\Http\Controllers\Api\SeccionBloqueController::class, 'update']);
     Route::delete('/secciones-bloque/{id}', [\App\Http\Controllers\Api\SeccionBloqueController::class, 'destroy']);
 
-    // Registro de formularios
     Route::get('/reg-componentes', [\App\Http\Controllers\Api\RegComponenteController::class, 'index']);
     Route::post('/reg-componentes', [\App\Http\Controllers\Api\RegComponenteController::class, 'store']);
     Route::get('/reg-componentes/{id}', [\App\Http\Controllers\Api\RegComponenteController::class, 'show']);
@@ -1069,14 +703,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/funcionalidades-form/{id}', [\App\Http\Controllers\Api\FuncionalidadFormController::class, 'update']);
     Route::delete('/funcionalidades-form/{id}', [\App\Http\Controllers\Api\FuncionalidadFormController::class, 'destroy']);
 
-    // Formato hoja de solicitud
     Route::get('/formatos-hoja-solicitud', [\App\Http\Controllers\Api\FormatoHojaSolicitudController::class, 'index']);
     Route::post('/formatos-hoja-solicitud', [\App\Http\Controllers\Api\FormatoHojaSolicitudController::class, 'store']);
     Route::get('/formatos-hoja-solicitud/{id}', [\App\Http\Controllers\Api\FormatoHojaSolicitudController::class, 'show']);
     Route::put('/formatos-hoja-solicitud/{id}', [\App\Http\Controllers\Api\FormatoHojaSolicitudController::class, 'update']);
     Route::delete('/formatos-hoja-solicitud/{id}', [\App\Http\Controllers\Api\FormatoHojaSolicitudController::class, 'destroy']);
 
-    // Menú y módulos del sistema legado
     Route::get('/menus-academicos', [\App\Http\Controllers\Api\MenuAcademicoController::class, 'index']);
     Route::post('/menus-academicos', [\App\Http\Controllers\Api\MenuAcademicoController::class, 'store']);
     Route::get('/menus-academicos/{id}', [\App\Http\Controllers\Api\MenuAcademicoController::class, 'show']);
@@ -1095,46 +727,8 @@ Route::prefix('portal')->middleware(['portal.key', 'solo.activos', 'rate.portal:
     Route::get('/banners', [BannerPortalController::class, 'index']);
     Route::get('/banners/{id}', [BannerPortalController::class, 'show']);
 
-    Route::get('/noticias', [\App\Http\Controllers\Api\NoticiaController::class, 'index']);
-    Route::get('/noticias/{id}', [\App\Http\Controllers\Api\NoticiaController::class, 'show']);
-    Route::get('/noticias/slug/{slug}', [\App\Http\Controllers\Api\NoticiaController::class, 'showBySlug']);
-
     Route::get('/eventos', [\App\Http\Controllers\Api\EventoController::class, 'index']);
     Route::get('/eventos/{id}', [\App\Http\Controllers\Api\EventoController::class, 'show']);
-    Route::get('/eventos/{eventoId}/fotos', [\App\Http\Controllers\Api\EventoFotoController::class, 'index']);
-
-    Route::get('/comunicados', [\App\Http\Controllers\Api\ComunicadoController::class, 'index']);
-    Route::get('/comunicados/slug/{slug}', [\App\Http\Controllers\Api\ComunicadoController::class, 'showBySlug']);
-    Route::get('/comunicados/{id}', [\App\Http\Controllers\Api\ComunicadoController::class, 'show']);
-
-    Route::get('/secretarias', [\App\Http\Controllers\Api\SecretariaController::class, 'index']);
-    Route::get('/secretarias/{id}', [\App\Http\Controllers\Api\SecretariaController::class, 'show']);
-
-
-
-    Route::get('/tramites', [\App\Http\Controllers\Api\TramiteController::class, 'index']);
-    Route::get('/tramites/{id}', [\App\Http\Controllers\Api\TramiteController::class, 'show']);
-    Route::get('/tramites/{id}/etapas', [\App\Http\Controllers\Api\TramiteSolicitudController::class, 'etapasPorTramite']);
-
-    Route::post('/tramite-solicitudes', [\App\Http\Controllers\Api\TramiteSolicitudController::class, 'storeSolicitudPortal']);
-    Route::get('/tramite-seguimiento/{numero}', [\App\Http\Controllers\Api\TramiteSolicitudController::class, 'consultarSeguimiento']);
-
-    Route::get('/normas', [\App\Http\Controllers\Api\NormaController::class, 'index']);
-    Route::get('/normas/{id}', [\App\Http\Controllers\Api\NormaController::class, 'show']);
-
-    Route::get('/documentos-transparencia', [\App\Http\Controllers\Api\DocumentoController::class, 'index']);
-    Route::get('/documentos-transparencia/{id}', [\App\Http\Controllers\Api\DocumentoController::class, 'show']);
-
-
-
-    Route::get('/nomina-personal', [\App\Http\Controllers\Api\NominaPersonalController::class, 'index']);
-
-
-    Route::get('/categorias-noticia', [\App\Http\Controllers\Api\CategoriaNoticiaController::class, 'index']);
-    Route::get('/tipos-evento', [\App\Http\Controllers\Api\TipoEventoController::class, 'index']);
-    Route::get('/tipos-tramite', [\App\Http\Controllers\Api\TipoTramiteController::class, 'index']);
-
-    Route::get('/menus/{nombre}/items', [\App\Http\Controllers\Api\MenuController::class, 'itemsByNombre']);
 
     Route::get('/redes-sociales', [RedSocialController::class, 'index']);
 
@@ -1144,21 +738,8 @@ Route::prefix('portal')->middleware(['portal.key', 'solo.activos', 'rate.portal:
 
     Route::get('/preguntas-frecuentes', [\App\Http\Controllers\Api\PreguntaFrecuenteController::class, 'index']);
 
-    Route::get('/galerias', [\App\Http\Controllers\Api\GaleriaController::class, 'index']);
-    Route::get('/galerias/{id}', [\App\Http\Controllers\Api\GaleriaController::class, 'show']);
-    Route::get('/galeria-items', [\App\Http\Controllers\Api\GaleriaItemController::class, 'index']);
-
-    Route::get('/proyectos', [\App\Http\Controllers\Api\ProyectoController::class, 'index']);
-
-
-    Route::get('/formularios-tramite', [\App\Http\Controllers\Api\FormularioTramitePortalController::class, 'index']);
-    Route::get('/formularios-tramite/{id}', [\App\Http\Controllers\Api\FormularioTramitePortalController::class, 'show']);
-
-    Route::get('/decretos-municipales', [\App\Http\Controllers\Api\DecretoMunicipalController::class, 'index']);
-    Route::get('/decretos-municipales/{id}', [\App\Http\Controllers\Api\DecretoMunicipalController::class, 'show']);
-
-    Route::get('/informes-auditoria', [\App\Http\Controllers\Api\InformeAuditoriaController::class, 'index']);
-    Route::get('/informes-auditoria/{id}', [\App\Http\Controllers\Api\InformeAuditoriaController::class, 'show']);
+    Route::get('/galeria-categorias', [\App\Http\Controllers\Api\GaleriaCategoriaController::class, 'index']);
+    Route::get('/galeria-categorias/{id}', [\App\Http\Controllers\Api\GaleriaCategoriaController::class, 'show']);
 
     Route::get('/testimonios', [\App\Http\Controllers\Api\TestimonioController::class, 'index']);
     Route::get('/testimonios/{id}', [\App\Http\Controllers\Api\TestimonioController::class, 'show']);
@@ -1184,12 +765,12 @@ Route::prefix('portal')->middleware(['portal.key', 'solo.activos', 'rate.portal:
     Route::get('/calendario-academico', [\App\Http\Controllers\Api\CalendarioAcademicoController::class, 'index']);
     Route::get('/calendario-academico/{id}', [\App\Http\Controllers\Api\CalendarioAcademicoController::class, 'show']);
 
-    Route::get('/galeria-categorias', [\App\Http\Controllers\Api\GaleriaCategoriaController::class, 'index']);
-    Route::get('/galeria-categorias/{id}', [\App\Http\Controllers\Api\GaleriaCategoriaController::class, 'show']);
-
     Route::get('/whatsapp-grupos', [\App\Http\Controllers\Api\WhatsappGrupoController::class, 'index']);
     Route::get('/whatsapp-grupos/{id}', [\App\Http\Controllers\Api\WhatsappGrupoController::class, 'show']);
 
     Route::get('/certificados/codigo/{codigo}', [\App\Http\Controllers\Api\CertificadoController::class, 'showByCode']);
     Route::post('/cert-verificaciones', [\App\Http\Controllers\Api\CertVerificacionController::class, 'store']);
 });
+
+Route::post('/public/preinscripciones', [\App\Http\Controllers\Api\PreinscripcionController::class, 'store'])
+    ->middleware('throttle:30,1');

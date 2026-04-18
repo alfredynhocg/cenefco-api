@@ -23,7 +23,7 @@ class WhatsappGrupoController extends Controller
         }
 
         $total = $q->count();
-        $data  = $q->orderBy('orden')->orderByDesc('id')->offset(($page - 1) * $size)->limit($size)->get();
+        $data = $q->orderBy('orden')->orderByDesc('id')->offset(($page - 1) * $size)->limit($size)->get();
 
         return response()->json(['data' => $data, 'total' => $total]);
     }
@@ -41,22 +41,22 @@ class WhatsappGrupoController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'imparte_id'              => ['required', 'integer'],
-            'nombre'                  => ['required', 'string', 'max:200'],
-            'enlace_invitacion'       => ['required', 'string', 'max:500'],
-            'capacidad_maxima'        => ['nullable', 'integer'],
-            'miembros_actuales'       => ['nullable', 'integer'],
-            'descripcion'             => ['nullable', 'string', 'max:300'],
-            'activo'                  => ['nullable', 'boolean'],
-            'orden'                   => ['nullable', 'integer'],
+            'imparte_id' => ['required', 'integer'],
+            'nombre' => ['required', 'string', 'max:200'],
+            'enlace_invitacion' => ['required', 'string', 'max:500'],
+            'capacidad_maxima' => ['nullable', 'integer'],
+            'miembros_actuales' => ['nullable', 'integer'],
+            'descripcion' => ['nullable', 'string', 'max:300'],
+            'activo' => ['nullable', 'boolean'],
+            'orden' => ['nullable', 'integer'],
             'fecha_expiracion_enlace' => ['nullable', 'date'],
         ]);
         $data['miembros_actuales'] = $request->integer('miembros_actuales', 0);
-        $data['activo']            = $request->boolean('activo', true);
-        $data['orden']             = $request->integer('orden', 0);
-        $data['created_at']        = now();
+        $data['activo'] = $request->boolean('activo', true);
+        $data['orden'] = $request->integer('orden', 0);
+        $data['created_at'] = now();
 
-        $id  = DB::table('web_whatsapp_grupo')->insertGetId($data);
+        $id = DB::table('web_whatsapp_grupo')->insertGetId($data);
         $row = DB::table('web_whatsapp_grupo')->find($id);
 
         return response()->json($row, 201);
@@ -70,14 +70,14 @@ class WhatsappGrupoController extends Controller
         }
 
         $data = $request->validate([
-            'imparte_id'              => ['sometimes', 'required', 'integer'],
-            'nombre'                  => ['sometimes', 'required', 'string', 'max:200'],
-            'enlace_invitacion'       => ['sometimes', 'required', 'string', 'max:500'],
-            'capacidad_maxima'        => ['nullable', 'integer'],
-            'miembros_actuales'       => ['nullable', 'integer'],
-            'descripcion'             => ['nullable', 'string', 'max:300'],
-            'activo'                  => ['nullable', 'boolean'],
-            'orden'                   => ['nullable', 'integer'],
+            'imparte_id' => ['sometimes', 'required', 'integer'],
+            'nombre' => ['sometimes', 'required', 'string', 'max:200'],
+            'enlace_invitacion' => ['sometimes', 'required', 'string', 'max:500'],
+            'capacidad_maxima' => ['nullable', 'integer'],
+            'miembros_actuales' => ['nullable', 'integer'],
+            'descripcion' => ['nullable', 'string', 'max:300'],
+            'activo' => ['nullable', 'boolean'],
+            'orden' => ['nullable', 'integer'],
             'fecha_expiracion_enlace' => ['nullable', 'date'],
         ]);
         $data['updated_at'] = now();

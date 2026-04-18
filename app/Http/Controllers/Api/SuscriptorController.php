@@ -11,15 +11,15 @@ class SuscriptorController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query    = $request->get('query', '');
-        $size     = (int) $request->get('pageSize', 20);
-        $page     = (int) $request->get('pageIndex', 1);
+        $query = $request->get('query', '');
+        $size = (int) $request->get('pageSize', 20);
+        $page = (int) $request->get('pageIndex', 1);
 
         $q = DB::table('web_suscriptor');
         if ($query) {
             $q->where(function ($sq) use ($query) {
                 $sq->where('email', 'like', "%{$query}%")
-                   ->orWhere('nombre', 'like', "%{$query}%");
+                    ->orWhere('nombre', 'like', "%{$query}%");
             });
         }
         if ($request->has('confirmado')) {
@@ -30,7 +30,7 @@ class SuscriptorController extends Controller
         }
 
         $total = $q->count();
-        $data  = $q->orderByDesc('id')->offset(($page - 1) * $size)->limit($size)->get();
+        $data = $q->orderByDesc('id')->offset(($page - 1) * $size)->limit($size)->get();
 
         return response()->json(['data' => $data, 'total' => $total]);
     }
@@ -48,15 +48,15 @@ class SuscriptorController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'email'  => ['required', 'email', 'max:100', 'unique:web_suscriptor,email'],
+            'email' => ['required', 'email', 'max:100', 'unique:web_suscriptor,email'],
             'nombre' => ['nullable', 'string', 'max:200'],
             'origen' => ['nullable', 'string', 'max:100'],
         ]);
-        $data['activo']    = true;
+        $data['activo'] = true;
         $data['confirmado'] = false;
         $data['created_at'] = now();
 
-        $id  = DB::table('web_suscriptor')->insertGetId($data);
+        $id = DB::table('web_suscriptor')->insertGetId($data);
         $row = DB::table('web_suscriptor')->find($id);
 
         return response()->json($row, 201);
@@ -70,9 +70,9 @@ class SuscriptorController extends Controller
         }
 
         $data = $request->validate([
-            'nombre'    => ['nullable', 'string', 'max:200'],
+            'nombre' => ['nullable', 'string', 'max:200'],
             'confirmado' => ['nullable', 'boolean'],
-            'activo'    => ['nullable', 'boolean'],
+            'activo' => ['nullable', 'boolean'],
         ]);
         $data['updated_at'] = now();
         DB::table('web_suscriptor')->where('id', $id)->update($data);

@@ -26,7 +26,7 @@ class CertVerificacionController extends Controller
         }
 
         $total = $q->count();
-        $data  = $q->orderByDesc('created_at')->offset(($page - 1) * $size)->limit($size)->get();
+        $data = $q->orderByDesc('created_at')->offset(($page - 1) * $size)->limit($size)->get();
 
         return response()->json(['data' => $data, 'total' => $total]);
     }
@@ -44,18 +44,18 @@ class CertVerificacionController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'certificado_id'   => ['nullable', 'integer'],
+            'certificado_id' => ['nullable', 'integer'],
             'codigo_consultado' => ['required', 'string', 'max:100'],
-            'resultado'        => ['required', 'string', 'max:20'],
-            'ip_origen'        => ['nullable', 'string', 'max:45'],
-            'user_agent'       => ['nullable', 'string', 'max:500'],
-            'pais'             => ['nullable', 'string', 'max:100'],
+            'resultado' => ['required', 'string', 'max:20'],
+            'ip_origen' => ['nullable', 'string', 'max:45'],
+            'user_agent' => ['nullable', 'string', 'max:500'],
+            'pais' => ['nullable', 'string', 'max:100'],
         ]);
-        $data['ip_origen']  = $data['ip_origen'] ?? $request->ip();
+        $data['ip_origen'] = $data['ip_origen'] ?? $request->ip();
         $data['user_agent'] = $data['user_agent'] ?? $request->userAgent();
         $data['created_at'] = now();
 
-        $id  = DB::table('t_cert_verificacion')->insertGetId($data);
+        $id = DB::table('t_cert_verificacion')->insertGetId($data);
         $row = DB::table('t_cert_verificacion')->find($id);
 
         return response()->json($row, 201);

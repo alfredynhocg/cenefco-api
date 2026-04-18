@@ -3,8 +3,8 @@
 return [
 
     'cenefco' => [
-        'nombre' => env('BOT_cenefco_NOMBRE', 'SENEFCO'),
-        'sigla' => env('BOT_cenefco_SIGLA', 'GAM'),
+        'nombre' => env('BOT_cenefco_NOMBRE', 'CENEFCO'),
+        'sigla' => env('BOT_cenefco_SIGLA', 'CENEFCO'),
 
         'horarios' => [
             'Lunes a Viernes' => '8:00 AM - 12:00 PM · 2:30 PM - 6:30 PM',
@@ -28,16 +28,16 @@ return [
     ],
 
     'keywords' => [
-        'tramites' => ['tramite', 'tramites', 'requisito', 'requisitos', 'proceso', 'procesos', 'gestion'],
-        'noticias' => ['noticia', 'noticias', 'novedad', 'novedades', 'comunicado', 'comunicados'],
-        'eventos' => ['evento', 'eventos', 'actividad', 'actividades', 'agenda'],
-        'secretarias' => ['secretaria', 'secretarias', 'departamento', 'oficina', 'contacto', 'contactos'],
-        'audiencias' => ['audiencia', 'audiencias', 'audiencia publica', 'audiencias publicas', 'participacion', 'rendicion'],
+        'saludo' => ['hola', 'buenas', 'buenos', 'buen dia', 'hi', 'hello', 'saludos', 'inicio', 'menu'],
+        'programas' => ['programa', 'programas', 'curso', 'cursos', 'diplomado', 'diplomados', 'especializacion', 'maestria', 'posgrado', 'oferta', 'oferta academica'],
+        'eventos' => ['evento', 'eventos', 'actividad', 'actividades', 'agenda', 'conferencia', 'taller', 'seminario', 'congreso'],
+        'docentes' => ['docente', 'docentes', 'profesor', 'profesores', 'catedratico', 'facilitador', 'planta docente'],
+        'faqs' => ['pregunta', 'preguntas', 'frecuentes', 'duda', 'dudas', 'ayuda', 'faq'],
+        'inscripcion' => ['inscripcion', 'inscribirme', 'inscribir', 'pre-inscripcion', 'preinscripcion', 'registro', 'postular', 'postulacion', 'requisito', 'requisitos'],
+        'consulta' => ['consultar', 'mi solicitud', 'estado inscripcion', 'verifcar inscripcion', 'numero ci', 'buscar'],
         'horario' => ['horario', 'horarios', 'hora', 'abierto', 'atienden', 'cuando', 'atencion'],
         'ubicacion' => ['ubicacion', 'direccion', 'donde', 'lugar', 'mapa', 'llegar'],
-        'soporte' => ['ayuda', 'soporte', 'asesor', 'hablar', 'persona', 'humano'],
-        'saludo' => ['hola', 'buenas', 'buenos', 'buen dia', 'hi', 'hello', 'saludos', 'inicio'],
-        'seguimiento' => ['seguimiento', 'estado de tramite', 'estado tramite', 'mi tramite', 'numero de seguimiento', 'consultar tramite', 'trm-'],
+        'soporte' => ['asesor', 'hablar', 'persona', 'humano', 'operador', 'contactar', 'comunicar'],
     ],
 
     'ia' => [
@@ -47,7 +47,7 @@ return [
         'temperature' => (float) env('AI_TEMPERATURE', 0.3),
         'timeout' => (int) env('AI_TIMEOUT_SECONDS', 30),
         'max_input_chars' => (int) env('AI_MAX_INPUT_CHARS', 500),
-        'rate_limit' => 20, // mensajes por minuto por número
+        'rate_limit' => 20,
     ],
 
 ];

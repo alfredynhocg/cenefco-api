@@ -12,8 +12,8 @@ class CalendarioAcademicoController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = $request->get('query', '');
-        $size  = (int) $request->get('pageSize', 50);
-        $page  = (int) $request->get('pageIndex', 1);
+        $size = (int) $request->get('pageSize', 50);
+        $page = (int) $request->get('pageIndex', 1);
 
         $q = DB::table('web_calendario_academico');
         if ($query) {
@@ -30,7 +30,7 @@ class CalendarioAcademicoController extends Controller
         }
 
         $total = $q->count();
-        $data  = $q->orderBy('fecha_inicio')->offset(($page - 1) * $size)->limit($size)->get();
+        $data = $q->orderBy('fecha_inicio')->offset(($page - 1) * $size)->limit($size)->get();
 
         return response()->json(['data' => $data, 'total' => $total]);
     }
@@ -48,23 +48,23 @@ class CalendarioAcademicoController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'titulo'       => ['required', 'string', 'max:300'],
-            'descripcion'  => ['nullable', 'string'],
-            'tipo'         => ['nullable', 'string', 'max:100'],
-            'color'        => ['nullable', 'string', 'max:7'],
-            'programa_id'  => ['nullable', 'integer'],
+            'titulo' => ['required', 'string', 'max:300'],
+            'descripcion' => ['nullable', 'string'],
+            'tipo' => ['nullable', 'string', 'max:100'],
+            'color' => ['nullable', 'string', 'max:7'],
+            'programa_id' => ['nullable', 'integer'],
             'fecha_inicio' => ['required', 'date'],
-            'fecha_fin'    => ['nullable', 'date'],
-            'todo_el_dia'  => ['nullable', 'boolean'],
-            'destacado'    => ['nullable', 'boolean'],
-            'publico'      => ['nullable', 'boolean'],
+            'fecha_fin' => ['nullable', 'date'],
+            'todo_el_dia' => ['nullable', 'boolean'],
+            'destacado' => ['nullable', 'boolean'],
+            'publico' => ['nullable', 'boolean'],
         ]);
-        $data['todo_el_dia']  = $request->boolean('todo_el_dia', true);
-        $data['destacado']    = $request->boolean('destacado', false);
-        $data['publico']      = $request->boolean('publico', true);
-        $data['created_at']   = now();
+        $data['todo_el_dia'] = $request->boolean('todo_el_dia', true);
+        $data['destacado'] = $request->boolean('destacado', false);
+        $data['publico'] = $request->boolean('publico', true);
+        $data['created_at'] = now();
 
-        $id  = DB::table('web_calendario_academico')->insertGetId($data);
+        $id = DB::table('web_calendario_academico')->insertGetId($data);
         $row = DB::table('web_calendario_academico')->find($id);
 
         return response()->json($row, 201);
@@ -78,16 +78,16 @@ class CalendarioAcademicoController extends Controller
         }
 
         $data = $request->validate([
-            'titulo'       => ['sometimes', 'required', 'string', 'max:300'],
-            'descripcion'  => ['nullable', 'string'],
-            'tipo'         => ['nullable', 'string', 'max:100'],
-            'color'        => ['nullable', 'string', 'max:7'],
-            'programa_id'  => ['nullable', 'integer'],
+            'titulo' => ['sometimes', 'required', 'string', 'max:300'],
+            'descripcion' => ['nullable', 'string'],
+            'tipo' => ['nullable', 'string', 'max:100'],
+            'color' => ['nullable', 'string', 'max:7'],
+            'programa_id' => ['nullable', 'integer'],
             'fecha_inicio' => ['sometimes', 'required', 'date'],
-            'fecha_fin'    => ['nullable', 'date'],
-            'todo_el_dia'  => ['nullable', 'boolean'],
-            'destacado'    => ['nullable', 'boolean'],
-            'publico'      => ['nullable', 'boolean'],
+            'fecha_fin' => ['nullable', 'date'],
+            'todo_el_dia' => ['nullable', 'boolean'],
+            'destacado' => ['nullable', 'boolean'],
+            'publico' => ['nullable', 'boolean'],
         ]);
         $data['updated_at'] = now();
         DB::table('web_calendario_academico')->where('id', $id)->update($data);

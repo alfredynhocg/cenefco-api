@@ -6,21 +6,16 @@ enum BotState: string
 {
     case MENU = 'menu';
     case SOPORTE = 'soporte';
-    case TRAMITES_LISTA = 'tramites_lista';
-    case TRAMITE_DETALLE = 'tramite_detalle';
-    case NOTICIAS = 'noticias';
-    case NOTICIA_DETALLE = 'noticia_detalle';
-    case COMUNICADOS = 'comunicados';
-    case COMUNICADO_DETALLE = 'comunicado_detalle';
+    case PROGRAMAS_LISTA = 'programas_lista';
+    case PROGRAMA_DETALLE = 'programa_detalle';
     case EVENTOS = 'eventos';
     case EVENTO_DETALLE = 'evento_detalle';
-    case SECRETARIAS = 'secretarias';
-    case SECRETARIA_DETALLE = 'secretaria_detalle';
-    case AUTORIDADES = 'autoridades';
-    case AUTORIDAD_DETALLE = 'autoridad_detalle';
-    case AUDIENCIAS_PUBLICAS = 'audiencias_publicas';
-    case AUDIENCIA_DETALLE = 'audiencia_detalle';
-    case SEGUIMIENTO_TRAMITE = 'seguimiento_tramite';
-    case TRAMITE_REGISTRO_NOMBRE = 'tramite_registro_nombre';
-    case TRAMITE_REGISTRO_CI = 'tramite_registro_ci';
+    case DOCENTES = 'docentes';
+    case DOCENTE_DETALLE = 'docente_detalle';
+    case CONSULTA_CI = 'consulta_ci';
+
+    case INSCRIPCION_NOMBRE = 'inscripcion_nombre';
+    case INSCRIPCION_CI = 'inscripcion_ci';
+    case INSCRIPCION_EMAIL = 'inscripcion_email';
+    case INSCRIPCION_CONFIRMAR = 'inscripcion_confirmar';
 }

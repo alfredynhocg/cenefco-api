@@ -99,17 +99,6 @@ class WhatsAppSendController extends Controller
         return response()->json($this->wa->sendLocationRequest($data['to'], $data['body'] ?? '¿Dónde te encuentras?'));
     }
 
-    // ─── Contactos ───────────────────────────────────────────────────────────
-
-    /**
-     * POST /api/whatsapp/send/contacts
-     * {
-     *   "to": "591...",
-     *   "contacts": [
-     *     { "first_name": "Juan", "last_name": "Pérez", "phone": "+591612345678" }
-     *   ]
-     * }
-     */
     public function contacts(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -123,21 +112,6 @@ class WhatsAppSendController extends Controller
         return response()->json($this->wa->sendContacts($data['to'], $data['contacts']));
     }
 
-    // ─── Interactivos ────────────────────────────────────────────────────────
-
-    /**
-     * POST /api/whatsapp/send/buttons
-     * {
-     *   "to": "591...",
-     *   "body": "¿Qué necesitas?",
-     *   "header": "Menú",
-     *   "footer": "Elige una opción",
-     *   "buttons": [
-     *     { "id": "btn_1", "title": "Opción 1" },
-     *     { "id": "btn_2", "title": "Opción 2" }
-     *   ]
-     * }
-     */
     public function buttons(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -153,24 +127,6 @@ class WhatsAppSendController extends Controller
         return response()->json($this->wa->sendButtons($data['to'], $data['body'], $data['buttons'], $data['header'] ?? '', $data['footer'] ?? ''));
     }
 
-    /**
-     * POST /api/whatsapp/send/list
-     * {
-     *   "to": "591...",
-     *   "header": "Catálogo",
-     *   "body": "Elige tu producto",
-     *   "footer": "PuntoVentas",
-     *   "button_text": "Ver opciones",
-     *   "sections": [
-     *     {
-     *       "title": "Electrónicos",
-     *       "rows": [
-     *         { "id": "prod_1", "title": "Laptop", "description": "Laptop HP 15'" }
-     *       ]
-     *     }
-     *   ]
-     * }
-     */
     public function list(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -190,19 +146,6 @@ class WhatsAppSendController extends Controller
         return response()->json($this->wa->sendList($data['to'], $data['header'], $data['body'], $data['footer'] ?? '', $data['button_text'], $data['sections']));
     }
 
-    // ─── Plantillas ──────────────────────────────────────────────────────────
-
-    /**
-     * POST /api/whatsapp/send/template
-     * {
-     *   "to": "591...",
-     *   "template": "hello_world",
-     *   "language": "en_US",
-     *   "parameters": [
-     *     { "type": "text", "text": "valor1" }
-     *   ]
-     * }
-     */
     public function template(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -215,12 +158,6 @@ class WhatsAppSendController extends Controller
         return response()->json($this->wa->sendTemplate($data['to'], $data['template'], $data['language'], $data['parameters'] ?? []));
     }
 
-    // ─── Productos ───────────────────────────────────────────────────────────
-
-    /**
-     * POST /api/whatsapp/send/product
-     * { "to":"591...", "catalog_id":"CAT123", "product_id":"SKU001", "body":"...", "footer":"..." }
-     */
     public function singleProduct(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -234,16 +171,6 @@ class WhatsAppSendController extends Controller
         return response()->json($this->wa->sendSingleProduct($data['to'], $data['catalog_id'], $data['product_id'], $data['body'] ?? '', $data['footer'] ?? ''));
     }
 
-    /**
-     * POST /api/whatsapp/send/products
-     * {
-     *   "to":"591...", "catalog_id":"CAT123",
-     *   "header":"Tienda", "body":"Elige", "footer":"PuntoVentas",
-     *   "sections":[
-     *     { "title":"Ropa", "products":[{"product_retailer_id":"SKU001"}] }
-     *   ]
-     * }
-     */
     public function multiProduct(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -261,12 +188,6 @@ class WhatsAppSendController extends Controller
         return response()->json($this->wa->sendMultiProduct($data['to'], $data['header'], $data['body'], $data['footer'] ?? '', $data['catalog_id'], $data['sections']));
     }
 
-    // ─── Mensajes ────────────────────────────────────────────────────────────
-
-    /**
-     * POST /api/whatsapp/message/read
-     * { "message_id": "wamid.xxx" }
-     */
     public function markAsRead(Request $request): JsonResponse
     {
         $data = $request->validate(['message_id' => 'required|string']);
@@ -274,10 +195,6 @@ class WhatsAppSendController extends Controller
         return response()->json($this->wa->markAsRead($data['message_id']));
     }
 
-    /**
-     * POST /api/whatsapp/message/react
-     * { "to": "591...", "message_id": "wamid.xxx", "emoji": "👍" }
-     */
     public function react(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -289,20 +206,11 @@ class WhatsAppSendController extends Controller
         return response()->json($this->wa->reactToMessage($data['to'], $data['message_id'], $data['emoji']));
     }
 
-    // ─── Perfil ──────────────────────────────────────────────────────────────
-
-    /**
-     * GET /api/whatsapp/profile
-     */
     public function getProfile(): JsonResponse
     {
         return response()->json($this->wa->getBusinessProfile());
     }
 
-    /**
-     * PUT /api/whatsapp/profile
-     * { "about": "...", "address": "...", "description": "...", "email": "..." }
-     */
     public function updateProfile(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -316,12 +224,6 @@ class WhatsAppSendController extends Controller
         return response()->json($this->wa->updateBusinessProfile($data));
     }
 
-    // ─── Media ───────────────────────────────────────────────────────────────
-
-    /**
-     * POST /api/whatsapp/media/upload
-     * Form-data: file (archivo a subir)
-     */
     public function uploadMedia(Request $request): JsonResponse
     {
         $request->validate(['file' => 'required|file']);
@@ -331,10 +233,6 @@ class WhatsAppSendController extends Controller
         return response()->json($response);
     }
 
-    /**
-     * GET /api/whatsapp/media/{mediaId}
-     * Descarga el archivo y lo devuelve como respuesta binaria.
-     */
     public function downloadMedia(string $mediaId): \Illuminate\Http\Response
     {
         $content = $this->wa->downloadMedia($mediaId);

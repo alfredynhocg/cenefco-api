@@ -2,10 +2,6 @@
 
 namespace App\Infrastructure\Shared\Services;
 
-use App\Infrastructure\Eventos\Models\Evento;
-use App\Infrastructure\Noticias\Models\Noticia;
-use App\Infrastructure\Secretarias\Models\Secretaria;
-use App\Infrastructure\TramitesCatalogo\Models\Tramite;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -79,7 +75,6 @@ class AgentService
 
         $inicio = microtime(true);
         $output = null;
-        $error = false;
 
         try {
             $response = Prism::text()
@@ -106,7 +101,6 @@ class AgentService
             return $output ?: null;
 
         } catch (\Throwable $e) {
-            $error = true;
             Log::error('[AgentService] Error Ollama', [
                 'phone' => $phone,
                 'input' => $input,
@@ -170,44 +164,44 @@ class AgentService
         $nombre = config('bot.cenefco.nombre');
         $sigla = config('bot.cenefco.sigla');
 
-        $tramites = Tramite::where('activo', true)
-            ->orderBy('nombre')
+        $programas = DB::table('t_programa')
+            ->join('t_tipoprograma', 't_programa.id_tipoprograma', '=', 't_tipoprograma.id_tipoprograma')
+            ->where('t_programa.estado', 1)
+            ->whereNull('t_programa.deleted_at')
+            ->orderBy('t_programa.orden')
             ->limit(10)
-            ->get(['nombre', 'costo', 'moneda', 'dias_habiles_resolucion'])
-            ->map(fn ($t) => "- {$t->nombre}"
-                .($t->costo > 0 ? " ({$t->costo} ".($t->moneda ?? 'Bs').')' : ' (Gratuito)')
-                .($t->dias_habiles_resolucion ? ", {$t->dias_habiles_resolucion}d" : '')
+            ->get(['t_programa.nombre_programa', 't_tipoprograma.nombre_tipoprograma', 't_programa.inicio_inscripciones'])
+            ->map(fn ($p) => "- {$p->nombre_programa} ({$p->nombre_tipoprograma})"
+                .($p->inicio_inscripciones && $p->inicio_inscripciones !== '2000-01-01'
+                    ? ', inscripciones desde '.date('d/m/Y', strtotime($p->inicio_inscripciones))
+                    : '')
             )
             ->implode("\n");
 
-        $secretarias = Secretaria::where('activa', true)
-            ->orderBy('nombre')
+        $docentes = DB::table('web_docente_perfil')
+            ->whereNull('deleted_at')
+            ->where('mostrar_en_web', 1)
+            ->where('estado', 'publicado')
+            ->orderBy('orden')
             ->limit(8)
-            ->get(['nombre', 'telefono', 'email'])
-            ->map(fn ($s) => "- {$s->nombre}"
-                .($s->telefono ? " (Tel: {$s->telefono})" : '')
-                .($s->email ? " ({$s->email})" : '')
+            ->get(['nombre_completo', 'titulo_academico', 'especialidad'])
+            ->map(fn ($d) => "- {$d->nombre_completo}"
+                .($d->titulo_academico ? " ({$d->titulo_academico})" : '')
+                .($d->especialidad ? " — {$d->especialidad}" : '')
             )
             ->implode("\n");
 
-        $noticias = Noticia::where('estado', 'publicado')
-            ->orderByDesc('fecha_publicacion')
-            ->limit(3)
-            ->get(['titulo', 'fecha_publicacion'])
-            ->map(fn ($n) => "- {$n->titulo}"
-                .($n->fecha_publicacion ? " ({$n->fecha_publicacion->format('d/m/Y')})" : '')
-            )
-            ->implode("\n");
-
-        $eventos = Evento::where('estado', 'publicado')
-            ->where('publico', true)
+        $eventos = DB::table('web_evento')
+            ->whereNull('deleted_at')
+            ->where('estado', 'publicado')
             ->where('fecha_inicio', '>=', now())
             ->orderBy('fecha_inicio')
             ->limit(5)
-            ->get(['titulo', 'fecha_inicio', 'lugar', 'descripcion'])
+            ->get(['titulo', 'fecha_inicio', 'lugar', 'modalidad'])
             ->map(fn ($e) => "- {$e->titulo}"
-                .($e->fecha_inicio ? " ({$e->fecha_inicio->format('d/m/Y H:i')})" : '')
+                .($e->fecha_inicio ? ' ('.date('d/m/Y', strtotime($e->fecha_inicio)).')' : '')
                 .($e->lugar ? " en {$e->lugar}" : '')
+                .($e->modalidad ? " [{$e->modalidad}]" : '')
             )
             ->implode("\n");
 
@@ -221,19 +215,16 @@ class AgentService
         return <<<CONTEXT
                 INSTITUCIÓN: {$nombre} ({$sigla})
                 DIRECCIÓN: {$ubicacion['direccion']}
-                HORARIOS: {$horarios}
+                HORARIOS DE ATENCIÓN: {$horarios}
                 TELÉFONO: {$contacto['telefono']}
                 EMAIL: {$contacto['email']}
                 WEB: {$contacto['web']}
 
-                TRÁMITES DISPONIBLES:
-                {$tramites}
+                PROGRAMAS Y CURSOS DISPONIBLES:
+                {$programas}
 
-                SECRETARÍAS:
-                {$secretarias}
-
-                NOTICIAS RECIENTES:
-                {$noticias}
+                PLANTA DOCENTE:
+                {$docentes}
 
                 PRÓXIMOS EVENTOS:
                 {$eventos}
@@ -245,16 +236,16 @@ class AgentService
         $nombre = config('bot.cenefco.nombre');
 
         return <<<SYSTEM
-                Eres el asistente virtual oficial de la {$nombre}. Respondes preguntas de ciudadanos por WhatsApp.
+                Eres el asistente virtual oficial de *{$nombre}*, un centro de formación continua y posgrado. Respondes preguntas de estudiantes y personas interesadas por WhatsApp.
 
                 REGLAS ESTRICTAS:
-                1. Responde ÚNICAMENTE con información del contexto provisto. Si no tienes la información, indica al ciudadano que se comunique directamente con la alcaldía.
+                1. Responde ÚNICAMENTE con información del contexto provisto. Si no tienes la información, indica al usuario que se comunique directamente con la institución o solicite soporte.
                 2. Responde siempre en español, de forma clara, amable y concisa (máximo 3-4 oraciones).
-                3. Nunca inventes datos, precios, fechas, nombres de funcionarios ni requisitos que no estén en el contexto.
-                4. No respondas preguntas fuera del ámbito municipal (política, entretenimiento, etc.).
+                3. Nunca inventes datos, precios, fechas ni requisitos que no estén en el contexto.
+                4. No respondas preguntas fuera del ámbito académico y de formación continua.
                 5. Usa formato simple sin markdown complejo — el mensaje irá por WhatsApp.
-                6. Si el ciudadano quiere hablar con una persona, indícale que puede solicitar soporte con el mensaje "soporte".
-                7. Si preguntan por un trámite específico con requisitos detallados, indica que escriban el nombre del trámite para ver el detalle completo.
+                6. Si el usuario quiere hablar con una persona, indícale que puede solicitar soporte escribiendo "soporte".
+                7. Si preguntan por un programa específico, indícales que seleccionen "Programas y Cursos" en el menú para ver todos los detalles.
 
                 CONTEXTO ACTUALIZADO DE LA INSTITUCIÓN:
                 {$contexto}

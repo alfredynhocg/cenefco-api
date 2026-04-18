@@ -12,14 +12,14 @@ class AcreditacionController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = $request->get('query', '');
-        $size  = (int) $request->get('pageSize', 20);
-        $page  = (int) $request->get('pageIndex', 1);
+        $size = (int) $request->get('pageSize', 20);
+        $page = (int) $request->get('pageIndex', 1);
 
         $q = DB::table('web_acreditacion');
         if ($query) {
             $q->where(function ($sq) use ($query) {
                 $sq->where('nombre', 'like', "%{$query}%")
-                   ->orWhere('entidad_otorgante', 'like', "%{$query}%");
+                    ->orWhere('entidad_otorgante', 'like', "%{$query}%");
             });
         }
         if ($request->has('tipo')) {
@@ -30,7 +30,7 @@ class AcreditacionController extends Controller
         }
 
         $total = $q->count();
-        $data  = $q->orderBy('orden')->orderBy('nombre')->offset(($page - 1) * $size)->limit($size)->get();
+        $data = $q->orderBy('orden')->orderBy('nombre')->offset(($page - 1) * $size)->limit($size)->get();
 
         return response()->json(['data' => $data, 'total' => $total]);
     }
@@ -48,23 +48,23 @@ class AcreditacionController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'nombre'           => ['required', 'string', 'max:300'],
+            'nombre' => ['required', 'string', 'max:300'],
             'entidad_otorgante' => ['required', 'string', 'max:200'],
-            'tipo'             => ['nullable', 'string', 'max:100'],
-            'descripcion'      => ['nullable', 'string'],
-            'logo_url'         => ['nullable', 'string', 'max:255'],
-            'logo_alt'         => ['nullable', 'string', 'max:255'],
+            'tipo' => ['nullable', 'string', 'max:100'],
+            'descripcion' => ['nullable', 'string'],
+            'logo_url' => ['nullable', 'string', 'max:255'],
+            'logo_alt' => ['nullable', 'string', 'max:255'],
             'url_verificacion' => ['nullable', 'string', 'max:255'],
-            'fecha_obtencion'  => ['nullable', 'date'],
+            'fecha_obtencion' => ['nullable', 'date'],
             'fecha_vencimiento' => ['nullable', 'date'],
-            'orden'            => ['nullable', 'integer'],
-            'activo'           => ['nullable', 'boolean'],
+            'orden' => ['nullable', 'integer'],
+            'activo' => ['nullable', 'boolean'],
         ]);
-        $data['orden']      = $request->integer('orden', 0);
-        $data['activo']     = $request->boolean('activo', true);
+        $data['orden'] = $request->integer('orden', 0);
+        $data['activo'] = $request->boolean('activo', true);
         $data['created_at'] = now();
 
-        $id  = DB::table('web_acreditacion')->insertGetId($data);
+        $id = DB::table('web_acreditacion')->insertGetId($data);
         $row = DB::table('web_acreditacion')->find($id);
 
         return response()->json($row, 201);
@@ -78,17 +78,17 @@ class AcreditacionController extends Controller
         }
 
         $data = $request->validate([
-            'nombre'           => ['sometimes', 'required', 'string', 'max:300'],
+            'nombre' => ['sometimes', 'required', 'string', 'max:300'],
             'entidad_otorgante' => ['sometimes', 'required', 'string', 'max:200'],
-            'tipo'             => ['nullable', 'string', 'max:100'],
-            'descripcion'      => ['nullable', 'string'],
-            'logo_url'         => ['nullable', 'string', 'max:255'],
-            'logo_alt'         => ['nullable', 'string', 'max:255'],
+            'tipo' => ['nullable', 'string', 'max:100'],
+            'descripcion' => ['nullable', 'string'],
+            'logo_url' => ['nullable', 'string', 'max:255'],
+            'logo_alt' => ['nullable', 'string', 'max:255'],
             'url_verificacion' => ['nullable', 'string', 'max:255'],
-            'fecha_obtencion'  => ['nullable', 'date'],
+            'fecha_obtencion' => ['nullable', 'date'],
             'fecha_vencimiento' => ['nullable', 'date'],
-            'orden'            => ['nullable', 'integer'],
-            'activo'           => ['nullable', 'boolean'],
+            'orden' => ['nullable', 'integer'],
+            'activo' => ['nullable', 'boolean'],
         ]);
         $data['updated_at'] = now();
         DB::table('web_acreditacion')->where('id', $id)->update($data);

@@ -12,8 +12,8 @@ class DescargableController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = $request->get('query', '');
-        $size  = (int) $request->get('pageSize', 20);
-        $page  = (int) $request->get('pageIndex', 1);
+        $size = (int) $request->get('pageSize', 20);
+        $page = (int) $request->get('pageIndex', 1);
 
         $q = DB::table('web_descargable');
         if ($query) {
@@ -30,7 +30,7 @@ class DescargableController extends Controller
         }
 
         $total = $q->count();
-        $data  = $q->orderBy('orden')->orderBy('nombre')->offset(($page - 1) * $size)->limit($size)->get();
+        $data = $q->orderBy('orden')->orderBy('nombre')->offset(($page - 1) * $size)->limit($size)->get();
 
         return response()->json(['data' => $data, 'total' => $total]);
     }
@@ -48,22 +48,22 @@ class DescargableController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'nombre'              => ['required', 'string', 'max:300'],
-            'tipo'                => ['nullable', 'string', 'max:100'],
-            'archivo_url'         => ['required', 'string', 'max:500'],
-            'imagen_portada_url'  => ['nullable', 'string', 'max:255'],
-            'programa_id'         => ['nullable', 'integer'],
-            'requiere_datos'      => ['nullable', 'boolean'],
-            'orden'               => ['nullable', 'integer'],
-            'activo'              => ['nullable', 'boolean'],
+            'nombre' => ['required', 'string', 'max:300'],
+            'tipo' => ['nullable', 'string', 'max:100'],
+            'archivo_url' => ['required', 'string', 'max:500'],
+            'imagen_portada_url' => ['nullable', 'string', 'max:255'],
+            'programa_id' => ['nullable', 'integer'],
+            'requiere_datos' => ['nullable', 'boolean'],
+            'orden' => ['nullable', 'integer'],
+            'activo' => ['nullable', 'boolean'],
         ]);
         $data['requiere_datos'] = $request->boolean('requiere_datos', true);
-        $data['descargas']      = 0;
-        $data['orden']          = $request->integer('orden', 0);
-        $data['activo']         = $request->boolean('activo', true);
-        $data['created_at']     = now();
+        $data['descargas'] = 0;
+        $data['orden'] = $request->integer('orden', 0);
+        $data['activo'] = $request->boolean('activo', true);
+        $data['created_at'] = now();
 
-        $id  = DB::table('web_descargable')->insertGetId($data);
+        $id = DB::table('web_descargable')->insertGetId($data);
         $row = DB::table('web_descargable')->find($id);
 
         return response()->json($row, 201);
@@ -77,14 +77,14 @@ class DescargableController extends Controller
         }
 
         $data = $request->validate([
-            'nombre'             => ['sometimes', 'required', 'string', 'max:300'],
-            'tipo'               => ['nullable', 'string', 'max:100'],
-            'archivo_url'        => ['sometimes', 'required', 'string', 'max:500'],
+            'nombre' => ['sometimes', 'required', 'string', 'max:300'],
+            'tipo' => ['nullable', 'string', 'max:100'],
+            'archivo_url' => ['sometimes', 'required', 'string', 'max:500'],
             'imagen_portada_url' => ['nullable', 'string', 'max:255'],
-            'programa_id'        => ['nullable', 'integer'],
-            'requiere_datos'     => ['nullable', 'boolean'],
-            'orden'              => ['nullable', 'integer'],
-            'activo'             => ['nullable', 'boolean'],
+            'programa_id' => ['nullable', 'integer'],
+            'requiere_datos' => ['nullable', 'boolean'],
+            'orden' => ['nullable', 'integer'],
+            'activo' => ['nullable', 'boolean'],
         ]);
         $data['updated_at'] = now();
         DB::table('web_descargable')->where('id', $id)->update($data);

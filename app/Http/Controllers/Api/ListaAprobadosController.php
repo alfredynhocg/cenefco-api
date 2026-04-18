@@ -29,7 +29,7 @@ class ListaAprobadosController extends Controller
         }
 
         $total = $q->count();
-        $data  = $q->orderByDesc('id')->offset(($page - 1) * $size)->limit($size)->get();
+        $data = $q->orderByDesc('id')->offset(($page - 1) * $size)->limit($size)->get();
 
         return response()->json(['data' => $data, 'total' => $total]);
     }
@@ -47,26 +47,26 @@ class ListaAprobadosController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'imparte_id'         => ['required', 'integer'],
-            'usuario_id'         => ['required', 'integer'],
-            'inscripcion_id'     => ['nullable', 'integer'],
-            'nota_final'         => ['nullable', 'numeric'],
-            'nota_minima'        => ['nullable', 'numeric'],
-            'condicion'          => ['nullable', 'string', 'max:50'],
-            'observacion'        => ['nullable', 'string', 'max:500'],
-            'ajuste_manual'      => ['nullable', 'boolean'],
+            'imparte_id' => ['required', 'integer'],
+            'usuario_id' => ['required', 'integer'],
+            'inscripcion_id' => ['nullable', 'integer'],
+            'nota_final' => ['nullable', 'numeric'],
+            'nota_minima' => ['nullable', 'numeric'],
+            'condicion' => ['nullable', 'string', 'max:50'],
+            'observacion' => ['nullable', 'string', 'max:500'],
+            'ajuste_manual' => ['nullable', 'boolean'],
             'estado_certificado' => ['nullable', 'string', 'max:50'],
-            'registrado_por'     => ['nullable', 'integer'],
-            'id_us_reg'          => ['nullable', 'integer'],
+            'registrado_por' => ['nullable', 'integer'],
+            'id_us_reg' => ['nullable', 'integer'],
         ]);
-        $data['condicion']          = $data['condicion'] ?? 'aprobado';
+        $data['condicion'] = $data['condicion'] ?? 'aprobado';
         $data['estado_certificado'] = $data['estado_certificado'] ?? 'pendiente';
-        $data['ajuste_manual']      = $request->boolean('ajuste_manual', false);
-        $data['notificado_email']   = false;
-        $data['id_us_reg']          = $request->integer('id_us_reg', 0);
-        $data['created_at']         = now();
+        $data['ajuste_manual'] = $request->boolean('ajuste_manual', false);
+        $data['notificado_email'] = false;
+        $data['id_us_reg'] = $request->integer('id_us_reg', 0);
+        $data['created_at'] = now();
 
-        $id  = DB::table('t_lista_aprobados')->insertGetId($data);
+        $id = DB::table('t_lista_aprobados')->insertGetId($data);
         $row = DB::table('t_lista_aprobados')->find($id);
 
         return response()->json($row, 201);
@@ -80,13 +80,13 @@ class ListaAprobadosController extends Controller
         }
 
         $data = $request->validate([
-            'nota_final'         => ['nullable', 'numeric'],
-            'nota_minima'        => ['nullable', 'numeric'],
-            'condicion'          => ['nullable', 'string', 'max:50'],
-            'observacion'        => ['nullable', 'string', 'max:500'],
-            'ajuste_manual'      => ['nullable', 'boolean'],
+            'nota_final' => ['nullable', 'numeric'],
+            'nota_minima' => ['nullable', 'numeric'],
+            'condicion' => ['nullable', 'string', 'max:50'],
+            'observacion' => ['nullable', 'string', 'max:500'],
+            'ajuste_manual' => ['nullable', 'boolean'],
             'estado_certificado' => ['nullable', 'string', 'max:50'],
-            'notificado_email'   => ['nullable', 'boolean'],
+            'notificado_email' => ['nullable', 'boolean'],
         ]);
         $data['updated_at'] = now();
         DB::table('t_lista_aprobados')->where('id', $id)->update($data);
