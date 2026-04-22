@@ -7,13 +7,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-/**
- * Controlador genérico para catálogos del sistema académico.
- * Cubre: t_ciudad, t_tipopago, t_tipouniversidad, t_universidad,
- *        t_ocupacion, t_profesion, t_modalidadtitulacion, t_catplan,
- *        t_nivel, t_hora.
- * Se accede vía prefijo de ruta: GET /catalogo-academico/{catalogo}
- */
 class CatalogoAcademicoController extends Controller
 {
     private const CATALOGOS = [

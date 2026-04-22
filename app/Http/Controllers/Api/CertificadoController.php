@@ -3,12 +3,29 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\CertificadoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class CertificadoController extends Controller
 {
+    public function generarLote(Request $request, CertificadoService $service): JsonResponse
+    {
+        $data = $request->validate([
+            'imparte_id' => ['required', 'integer'],
+            'plantilla_id' => ['required', 'integer'],
+        ]);
+
+        try {
+            $resultado = $service->generarLote((int) $data['imparte_id'], (int) $data['plantilla_id']);
+        } catch (\RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json($resultado, 200);
+    }
+
     public function index(Request $request): JsonResponse
     {
         $query = $request->get('query', '');

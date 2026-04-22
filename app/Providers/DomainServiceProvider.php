@@ -75,7 +75,11 @@ class DomainServiceProvider extends ServiceProvider
 
         $this->app->bind(\App\Domain\Comunicados\Contracts\ComunicadoRepositoryInterface::class, \App\Infrastructure\Comunicados\Repositories\EloquentComunicadoRepository::class);
 
-        // Permisos del sistema
         $this->app->bind(\App\Domain\Permisos\Contracts\PermisoRepositoryInterface::class, \App\Infrastructure\Permisos\Repositories\EloquentPermisoRepository::class);
+
+        $this->app->bind(
+            \App\Domain\Moodle\Contracts\MoodleCourseRepositoryInterface::class,
+            \App\Infrastructure\Moodle\Repositories\MoodleCourseRepository::class
+        );
     }
 }

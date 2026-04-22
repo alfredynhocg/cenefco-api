@@ -12,7 +12,7 @@ Implementa **DDD (Domain-Driven Design) + CQRS** de forma estricta en todas las 
 
 Stack: PHP 8.2 · Laravel 12 · MySQL 8 · Laravel Sanctum · DomPDF · Spatie Laravel Settings
 
-Módulos principales: Cursos · Diplomados · Programas · Inscripciones · Notas · Pagos · Docentes · Estudiantes · Horarios · Usuarios y roles · Permisos · Contenido web
+Módulos principales: Cursos · Diplomados · Programas · Inscripciones · Notas · Pagos · Docentes · Estudiantes · Horarios · Usuarios y roles · Permisos · Contenido web · **Web Institucional** · **Certificados con QR** · **Pre-inscripción** · **WhatsApp grupos**
 
 ---
 
@@ -509,7 +509,7 @@ Las settings se guardan en la tabla `settings`. No usar `config()` para datos qu
 
 ## Base de datos cenefco (legado SIASEC)
 
-El proyecto incluye **145 migraciones** generadas a partir del sistema legado SIASEC (`disereco_siasec`), correspondiente al sistema académico de posgrado (UPEA). Estas tablas conviven en la misma BD que las tablas propias del proyecto.
+El proyecto incluye **145 migraciones** generadas a partir del sistema legado SIASEC (`disereco_siasec`) más **~18 migraciones nuevas** para la capa web institucional y el módulo de certificados. Todas conviven en la misma BD.
 
 ### Convención de nombres
 
@@ -535,7 +535,7 @@ Ejemplo: `2026_04_14_000134_create_cenefco_t_usuario_table.php`
 | **Relaciones usuario** | `t_usuarioplan`, `t_usuarioprograma`, `t_usuariotipoprograma`, `t_usuarioplandoc` |
 | **Logs** | Todas las tablas tienen su espejo `_log` (registran cambios históricos) |
 
-### Convenciones de estas tablas
+### Convenciones de tablas legado (`t_*`, `mdl_*`)
 
 - Los nombres originales **se conservan tal cual** (prefijo `t_` o `mdl_`). No se renombran.
 - PKs compuestas: mayoría de tablas usa `PRIMARY KEY (id_campo, id_us_reg)` — se genera con `$table->primary([...])`.
@@ -543,6 +543,49 @@ Ejemplo: `2026_04_14_000134_create_cenefco_t_usuario_table.php`
 - **No usar `$table->softDeletes()`** — usan `estado tinyint` (0=inactivo, 1=activo).
 - Las tablas `_log` registran el historial de cambios y tienen un campo `tipo_log` varchar.
 - `id_us_reg` = usuario que registró el dato (auditoría interna del sistema legado).
+
+### Convenciones de tablas nuevas (`web_*`, `t_cert_*`)
+
+Estas tablas siguen convenciones modernas de Laravel y son **incompatibles** con las del legado:
+
+- `bigIncrements('id')` como PK simple — **nunca PK compuesta**.
+- `timestampTz('created_at')`, `timestampTz('updated_at')`, `timestampTz('deleted_at')` — **usar `timestampTz`, no `timestamps()`** (sin timezone).
+- Estado como `string` semántico: `borrador` / `publicado` / `archivado` — **no `tinyint`**.
+- FK constraints declarados con `->foreign()` y `->index()` explícito.
+- Slugs únicos en toda tabla con URL pública (`->unique()`).
+- `boolean('activo')`, `boolean('destacado')`, `integer('orden')` — campos estándar de contenido web.
+
+### Tablas `web_*` por prioridad
+
+| Prioridad | Tablas |
+|-----------|--------|
+| 🔴 Crítico | `web_banner`, `web_configuracion_sitio`, `web_suscriptor`, `web_contacto_mensaje` |
+| 🟠 Alta | `web_testimonio`, `web_faq`, `web_aliado`, `web_preinscripcion`, `web_descargable`, `web_descargable_registro`, `web_cifra_institucional`, `web_acreditacion` |
+| 🟡 Media | `web_evento`, `web_docente_perfil`, `web_popup`, `web_etiqueta`, `web_articulo_etiqueta`, `web_programa_etiqueta`, `web_categoria_programa`, `web_programa_resena`, `web_galeria_video`, `web_hito_institucional`, `web_nota_prensa`, `web_redes_sociales`, `web_calendario_academico`, `web_whatsapp_grupo` |
+| 🟢 Baja | `web_redireccion`, `web_galeria_categoria`, `web_notificacion_push`, `web_descuento_promocion` |
+
+También se agregan campos web a tablas legado existentes: `t_articulo` (slug, SEO, vistas, destacada), `t_programa` (slug, SEO, destacado, orden), `t_pagina` (slug, contenido_html, SEO), `t_foto` (alt, orden), `t_boletin` (slug, imagen, SEO).
+
+### Módulo de Certificados
+
+Tablas propias del módulo (prefijo `t_cert_*`):
+
+```text
+t_cert_plantilla           → Plantilla JPG + configuración visual
+t_cert_plantilla_campo     → Posición X/Y, fuente y estilo por campo
+t_lista_aprobados          → Lista oficial de aprobados por apertura de curso
+t_certificado              → Certificado generado con código único + QR
+t_cert_verificacion        → Log de verificaciones públicas desde la web
+```
+
+- Código único: formato `cenefco-{AÑO}-{6 chars}` (ej: `cenefco-2026-A4X9K2`)
+- Endpoint público: `GET /verificar/{codigo}` — devuelve VÁLIDO / ANULADO / NO ENCONTRADO
+- Generación masiva: `CertificadoService::generarLote(imparteId, plantillaId)`
+- Dependencias: `simplesoftwareio/simple-qrcode`, `intervention/image`
+
+### Integración WhatsApp
+
+Campo `whatsapp_grupo_url` en `t_imparte` (Opción A — un grupo por curso). Si un curso necesita múltiples grupos usar tabla `web_whatsapp_grupo` (Opción B). Campo `whatsapp_unido` en `t_inscripcion` para rastrear si el estudiante accedió al enlace.
 
 ### Ejecutar solo migraciones cenefco
 

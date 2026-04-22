@@ -48,11 +48,39 @@ class WhatsAppBotService
                 ?? $message['interactive']['list_reply']['id']
                 ?? '';
             $this->routeByButton($from, $id);
+
+            return;
         }
+
+        $this->handleUnsupportedType($from, $type);
+    }
+
+    private function handleUnsupportedType(string $from, string $type): void
+    {
+        $mensajes = [
+            'image' => '🖼️ Recibí tu imagen, pero por ahora solo proceso mensajes de texto. ¿En qué puedo ayudarte?',
+            'audio' => '🎙️ Recibí tu nota de voz, pero aún no proceso audios. Por favor escribe tu consulta.',
+            'video' => '🎥 Recibí tu video, pero solo proceso mensajes de texto. ¿En qué puedo ayudarte?',
+            'document' => '📄 Recibí tu documento, pero no proceso archivos. Escribe tu consulta en texto.',
+            'sticker' => '😄 Bonito sticker! Si necesitas ayuda, escribe tu consulta o usa el *menú*.',
+            'location' => '📍 Recibí tu ubicación. Si necesitas saber dónde estamos, escribe *ubicación*.',
+            'contacts' => '👤 Recibí un contacto, pero solo proceso texto. ¿En qué puedo ayudarte?',
+        ];
+
+        $respuesta = $mensajes[$type] ?? 'Por el momento solo proceso mensajes de texto. ¿En qué puedo ayudarte?';
+        $this->wa->sendText($from, $respuesta);
+        $this->menu->handle($from);
     }
 
     private function routeByText(string $from, string $text, string $estado): void
     {
+        if ($text === '') {
+            $this->wa->sendText($from, '¿En qué puedo ayudarte? Escribe tu consulta o usa el menú. 😊');
+            $this->menu->handle($from);
+
+            return;
+        }
+
         if ($estado === BotState::SOPORTE->value) {
             $this->wa->sendText($from, '📩 Tu mensaje fue recibido. Un asesor te atenderá pronto.');
 
@@ -92,22 +120,20 @@ class WhatsAppBotService
             return;
         }
 
-        $lower = strtolower($this->removeAccents($text));
-        $keywords = config('bot.keywords');
+        $intents = $this->detectarIntents($text);
 
-        foreach ($keywords as $intent => $words) {
-            foreach ($words as $word) {
-                if (str_contains($lower, $word)) {
-                    $this->dispatchKeyword($from, $intent);
+        // Intent único claro → handler directo (respuesta inmediata, sin IA)
+        if (count($intents) === 1) {
+            $this->dispatchKeyword($from, $intents[0]);
 
-                    return;
-                }
-            }
+            return;
         }
 
+        // Múltiples intents o ninguno → la IA responde todo en uno
         $this->wa->sendText($from, '⏳ Un momento, buscando la respuesta...');
 
-        $respuesta = $this->agent->responder($from, $text);
+        $historial = $this->conv->getUltimosMensajes($from, 6);
+        $respuesta = $this->agent->responder($from, $text, $historial);
 
         if ($respuesta !== null) {
             $this->wa->sendText($from, $respuesta);
@@ -118,21 +144,70 @@ class WhatsAppBotService
         $this->menu->handle($from);
     }
 
+    private function detectarIntents(string $text): array
+    {
+        $lower    = strtolower($this->removeAccents($text));
+        $keywords = config('bot.keywords');
+        $found    = [];
+
+        foreach ($keywords as $intent => $words) {
+            foreach ($words as $word) {
+                if (str_contains($lower, $word)) {
+                    $found[] = $intent;
+                    break; // un match por intent es suficiente
+                }
+            }
+        }
+
+        return array_unique($found);
+    }
+
     private function dispatchKeyword(string $from, string $intent): void
     {
         match ($intent) {
-            'saludo' => $this->sendBienvenida($from),
-            'programas' => $this->programa->showLista($from),
-            'eventos' => $this->info->showEventos($from),
-            'docentes' => $this->docente->showLista($from),
-            'faqs' => $this->info->showFaqs($from),
-            'inscripcion' => $this->menu->handleInscripcion($from),
-            'consulta' => $this->seguimiento->pedirCI($from),
-            'horario' => $this->menu->handleHorario($from),
-            'ubicacion' => $this->menu->handleUbicacion($from),
-            'soporte' => $this->menu->handleSoporte($from),
-            default => $this->menu->handle($from),
+            'saludo'       => $this->sendBienvenida($from),
+            'programas'    => $this->programa->showLista($from),
+            'eventos'      => $this->info->showEventos($from),
+            'docentes'     => $this->docente->showLista($from),
+            'faqs'         => $this->info->showFaqs($from),
+            'inscripcion'  => $this->menu->handleInscripcion($from),
+            'consulta'     => $this->seguimiento->pedirCI($from),
+            'horario'      => $this->menu->handleHorario($from),
+            'ubicacion'    => $this->menu->handleUbicacion($from),
+            'pago'         => $this->handlePago($from),
+            'acreditacion' => $this->handleAcreditacion($from),
+            'soporte'      => $this->menu->handleSoporte($from),
+            default        => $this->menu->handle($from),
         };
+    }
+
+    private function handlePago(string $from): void
+    {
+        $pagos = config('bot.cenefco.pagos');
+
+        $this->wa->sendText($from,
+            "💳 *Métodos de pago*\n\n"
+            ."{$pagos['metodos']}\n\n"
+            ."{$pagos['instrucciones']}\n\n"
+            ."ℹ️ {$pagos['nota']}"
+        );
+
+        // E: enviar QR como imagen si está configurado
+        if (! empty($pagos['qr_image_url'])) {
+            $this->wa->sendImage($from, $pagos['qr_image_url'], '📲 Escanea este QR para realizar tu pago.');
+        }
+    }
+
+    private function handleAcreditacion(string $from): void
+    {
+        $acred = config('bot.cenefco.acreditacion');
+        $this->wa->sendText($from,
+            "🎓 *Acreditación e Institucionalidad*\n\n"
+            ."✅ Aval universitario: {$acred['aval']}\n"
+            ."📋 {$acred['resolucion']}\n"
+            ."🏛️ Autorizados por: {$acred['autoriza']}\n\n"
+            ."{$acred['descripcion']}"
+        );
     }
 
     private function routeByButton(string $from, string $id): void

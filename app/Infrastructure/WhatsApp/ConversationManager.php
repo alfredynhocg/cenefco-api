@@ -80,6 +80,26 @@ class ConversationManager
         }
     }
 
+    public function getUltimosMensajes(string $phone, int $limit = 6): array
+    {
+        $conv = WhatsappConversacion::where('phone', $phone)->first();
+        if (! $conv) {
+            return [];
+        }
+
+        return WhatsappMensaje::where('conversacion_id', $conv->id)
+            ->whereIn('tipo', ['text', 'texto'])
+            ->whereNotNull('contenido')
+            ->orderByDesc('id')
+            ->skip(1)
+            ->take($limit)
+            ->get(['direccion', 'contenido'])
+            ->reverse()     
+            ->values()
+            ->map(fn ($m) => ['direccion' => $m->direccion, 'contenido' => $m->contenido])
+            ->toArray();
+    }
+
     public function logSaliente(string $phone, string $tipo, ?string $contenido): void
     {
         try {

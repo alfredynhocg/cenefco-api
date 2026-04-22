@@ -21,6 +21,10 @@ API REST para la gestión de cursos, diplomados y programas de formación contin
 | **Usuarios y Roles** | Control de acceso con niveles, grupos de permisos y permisos granulares |
 | **Contenido web** | Páginas, módulos, menús y bloques de plantilla del sistema |
 | **Configuración** | Ajustes globales del sistema vía `spatie/laravel-settings` |
+| **Web Institucional** | Banners, testimonios, FAQ, aliados, suscriptores, mensajes de contacto, docente-perfil, eventos, etiquetas, categorías de programas, popups y galerías de video |
+| **Certificados** | Plantillas JPG, lista de aprobados, generación masiva con QR y verificación pública por código único |
+| **Pre-inscripción** | Captación de leads por programa con rastreo UTM y notificación automática al abrir convocatoria |
+| **WhatsApp** | Grupos de WhatsApp por apertura de curso con control de vigencia del enlace |
 
 ---
 
@@ -55,6 +59,7 @@ app/
 | **DomPDF** | `^3.1` | Generación de documentos PDF |
 | **L5 Swagger** | `^10.1` | Documentación OpenAPI auto-generada |
 | **Intervention Image** | `^1.5` | Procesamiento de imágenes |
+| **Simple QrCode** | `^4.x` | Generación de códigos QR para certificados |
 
 ---
 
@@ -200,7 +205,7 @@ Route::get('/usuarios', [UserController::class, 'index'])
 
 ## Base de datos cenefco (legado SIASEC)
 
-El proyecto incluye **145 migraciones Laravel** generadas a partir del backup `disereco_siasec_backup.sql` del sistema legado SIASEC. Estas migraciones permiten recrear el esquema completo en cualquier entorno.
+El proyecto incluye **145 migraciones Laravel** generadas a partir del backup `disereco_siasec_backup.sql` del sistema legado SIASEC, más **~18 migraciones nuevas** para la capa web institucional y el módulo de certificados. Estas migraciones permiten recrear el esquema completo en cualquier entorno.
 
 ### Convención de nombres
 
@@ -220,14 +225,24 @@ Todas están en `database/migrations/` con el prefijo `cenefco_` en el nombre de
 | `t_nivel` | Niveles de acceso del sistema |
 | `t_bitacora*`, `t_log*` | Auditoría y trazabilidad |
 | `t_config*` | Configuraciones globales del sistema |
+| `web_*` | Tablas nuevas para la web institucional (banners, testimonios, FAQ, etc.) |
+| `t_cert_*` | Módulo de certificados (plantillas, campos, generación, verificación) |
 
 ### Convenciones del esquema legado
 
-- **Sin `timestamps()`** — el esquema no usa `created_at` / `updated_at`
+**Tablas legado (`t_*`, `mdl_*`):**
+- **Sin `timestamps()`** — usan `fecha_reg` propio; no hay `created_at` / `updated_at`
 - **Sin `softDeletes()`** — baja lógica mediante columna `estado` (`tinyint`, `1` = activo, `0` = inactivo)
 - **`id_us_reg`** — columna de auditoría que registra el usuario que creó/modificó el registro
 - **Claves primarias compuestas** — varias tablas usan `$table->primary([...])` con múltiples columnas
-- **Sin `bigIncrements`** — los IDs son `integer` simples, no auto-incrementales en todas las tablas
+- **Sin `bigIncrements`** — los IDs son `integer` simples
+
+**Tablas nuevas (`web_*`, `t_cert_*`):**
+- Usan `bigIncrements('id')` como PK simple
+- `timestampTz` para `created_at`, `updated_at` y `deleted_at`
+- Estado como `string` semántico (`borrador` / `publicado` / `archivado`), no `tinyint`
+- FK constraints declarados formalmente con `->foreign()`
+- Slugs únicos en tablas de contenido público
 
 ### Ejecutar las migraciones cenefco
 

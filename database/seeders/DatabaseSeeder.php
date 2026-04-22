@@ -28,6 +28,8 @@ class DatabaseSeeder extends Seeder
             WebGaleriaCategoriaSeeder::class,
             WebFaqSeeder::class,
             WebHitoInstitucionalSeeder::class,
+
+            CertificadoDemoSeeder::class,
         ]);
 
         $this->enableForeignKeys();

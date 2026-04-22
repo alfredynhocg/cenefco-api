@@ -372,6 +372,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         ->middleware('permiso:inscripciones.ver');
     Route::post('/certificados', [\App\Http\Controllers\Api\CertificadoController::class, 'store'])
         ->middleware('permiso:inscripciones.editar');
+    Route::post('/certificados/generar-lote', [\App\Http\Controllers\Api\CertificadoController::class, 'generarLote'])
+        ->middleware('permiso:inscripciones.editar');
     Route::get('/certificados/codigo/{codigo}', [\App\Http\Controllers\Api\CertificadoController::class, 'showByCode']);
     Route::get('/certificados/{id}', [\App\Http\Controllers\Api\CertificadoController::class, 'show']);
     Route::put('/certificados/{id}', [\App\Http\Controllers\Api\CertificadoController::class, 'update'])
@@ -774,3 +776,15 @@ Route::prefix('portal')->middleware(['portal.key', 'solo.activos', 'rate.portal:
 
 Route::post('/public/preinscripciones', [\App\Http\Controllers\Api\PreinscripcionController::class, 'store'])
     ->middleware('throttle:30,1');
+
+Route::post('/public/upload/file', [\App\Http\Controllers\Api\UploadController::class, 'file'])
+    ->middleware('throttle:60,1');
+
+Route::get('/public/cursos', [\App\Http\Controllers\Api\CursoController::class, 'index']);
+Route::get('/public/cursos/{id}', [\App\Http\Controllers\Api\CursoController::class, 'show']);
+
+Route::middleware(['auth:sanctum'])->prefix('moodle')->group(function () {
+    Route::get('/courses', [\App\Http\Controllers\Api\MoodleCourseController::class, 'index']);
+    Route::post('/courses', [\App\Http\Controllers\Api\MoodleCourseController::class, 'store']);
+    Route::post('/courses/from-curso/{id}', [\App\Http\Controllers\Api\MoodleCourseController::class, 'fromCurso']);
+});

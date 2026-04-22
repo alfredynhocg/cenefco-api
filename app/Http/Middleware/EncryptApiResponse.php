@@ -6,27 +6,12 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Cifra la respuesta JSON con AES-256-CBC.
- *
- * El cliente necesita la misma API_ENCRYPT_KEY para descifrar.
- * Formato de respuesta cifrada:
- * {
- *   "encrypted": "<base64 del ciphertext>",
- *   "iv":        "<hex del IV aleatorio de 16 bytes>"
- * }
- *
- * Para descifrar en el cliente (Angular / Web Crypto API):
- *   const key = await crypto.subtle.importKey('raw', hexToBuffer(API_ENCRYPT_KEY), 'AES-CBC', false, ['decrypt']);
- *   const plain = await crypto.subtle.decrypt({ name: 'AES-CBC', iv: hexToBuffer(iv) }, key, base64ToBuffer(encrypted));
- */
 class EncryptApiResponse
 {
     public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);
 
-        // Solo cifrar respuestas JSON exitosas
         if (! $this->debecifrarse($response)) {
             return $response;
         }

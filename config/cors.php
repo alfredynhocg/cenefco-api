@@ -7,12 +7,13 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        'http://localhost:4200',
-        'http://localhost:54142',
         'https://achocalla.gob.bo',
     ],
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => [
+        '#^https?://localhost(:\d+)?$#',
+        '#^https?://127\.0\.0\.1(:\d+)?$#',
+    ],
 
     'allowed_headers' => ['Content-Type', 'Accept', 'Authorization', 'X-Portal-Key'],
 

@@ -47,4 +47,9 @@ return [
         'api_key' => env('PORTAL_API_KEY'),
     ],
 
+    'moodle' => [
+        'url' => env('MOODLE_URL', 'http://moodle.local'),
+        'token' => env('MOODLE_TOKEN'),
+    ],
+
 ];

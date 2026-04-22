@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\VerifyEmailController;
-// CatalogoController removed — not yet implemented
 use App\Http\Controllers\Api\PagoController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,13 +30,6 @@ Route::middleware('auth:sanctum')->prefix('email')->group(function () {
     Route::post('/resend', [VerifyEmailController::class, 'resend'])
         ->middleware('throttle:6,1');
 });
-
-// Catálogo (pendiente de implementación)
-// Route::prefix('catalogo')->group(function () {
-//     Route::get('/productos', [CatalogoController::class, 'productos']);
-//     Route::get('/productos/{slug}', [CatalogoController::class, 'producto']);
-//     Route::get('/categorias', [CatalogoController::class, 'categorias']);
-// });
 
 Route::prefix('v1')->group(base_path('routes/api/v1.php'));
 
