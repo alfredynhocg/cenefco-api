@@ -46,6 +46,7 @@ class CertificadoService
             throw new \RuntimeException('Apertura de curso no encontrada (id_imp='.$imparteId.').');
         }
 
+        // Incluye registros "pendiente" O registros "generado"/"aprobado" sin certificado emitido
         $aprobados = DB::table('t_lista_aprobados as la')
             ->join('t_usuario as u', function ($join) {
                 $join->on('la.usuario_id', '=', 'u.id_us')
@@ -53,28 +54,22 @@ class CertificadoService
             })
             ->select('la.*', 'u.nombre', 'u.appaterno', 'u.apmaterno', 'u.email', 'u.ci')
             ->where('la.imparte_id', $imparteId)
-            ->where('la.estado_certificado', 'pendiente')
+            ->where('la.condicion', 'aprobado')
+            ->whereNotIn('la.id', DB::table('t_certificado')->pluck('lista_aprobado_id'))
             ->get();
 
         $generados = [];
         $errores = [];
 
         foreach ($aprobados as $aprobado) {
-            $yaExiste = DB::table('t_certificado')
-                ->where('lista_aprobado_id', $aprobado->id)
-                ->exists();
-            if ($yaExiste) {
-                continue;
-            }
-
             try {
-                $cert = $this->generarCertificado($aprobado, $plantilla, $campos, $imparte);
+                $cert = DB::transaction(fn () => $this->generarCertificado($aprobado, $plantilla, $campos, $imparte));
                 $generados[] = $cert;
             } catch (\Throwable $e) {
                 $errores[] = [
                     'usuario_id' => $aprobado->usuario_id,
-                    'nombre' => trim($aprobado->appaterno.' '.$aprobado->nombre),
-                    'error' => $e->getMessage(),
+                    'nombre'     => trim(($aprobado->appaterno ?? '').' '.($aprobado->nombre ?? '')),
+                    'error'      => $e->getMessage(),
                 ];
             }
         }

@@ -48,7 +48,7 @@ class PreinscripcionController extends Controller
                     ->get();
 
                 foreach ($camposDefinicion as $campo) {
-                    $regla = $campo->requerido ? ['required'] : ['nullable'];
+                    $regla = ['nullable'];
 
                     $regla[] = match ($campo->tipo_campo) {
                         'email'  => 'email',
